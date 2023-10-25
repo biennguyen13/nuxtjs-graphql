@@ -1,0 +1,13 @@
+mutation Login($email: String!, $password: String!) {
+  login(email: $email, password: $password) {
+    ... on ResponeLogin {
+      id
+      email
+      name
+      accessToken
+    }
+    ... on Error {
+      message
+    }
+  }
+}

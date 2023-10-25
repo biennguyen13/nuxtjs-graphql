@@ -1,0 +1,18 @@
+query Book($FEN: String!) {
+  book(FEN: $FEN) {
+    id
+    vkey
+    vmove
+    vscore
+    vwin
+    vdraw
+    vmemo
+    chessdbscore
+    vlost
+    vFEN
+    vvalid
+    isfetched
+    countFetched
+    chessdbInfo
+  }
+}

@@ -45,7 +45,27 @@ export default defineNuxtConfig({
   devServer: {
     port: 3001,
   },
-  modules: [],
+  modules: ["@nuxtjs/apollo"],
+  apollo: {
+    autoImports: true,
+    authType: "Bearer",
+    authHeader: "Authorization",
+    tokenStorage: "cookie",
+    proxyCookies: true,
+    clients: {
+      default: {
+        tokenName: "apollo:graphql.token",
+        httpLinkOptions: {
+          // credentials: "include",
+          headers: {
+            "X-Api-Cdb-token":
+              "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyIjp7ImlwIjoiMTI3LjAuMC4xIn0sImlhdCI6MTY5ODIzMTg4OCwiZXhwIjoxNjk4MjM1NDg4fQ.eLEJSCP_bz1lePJNyO5BljOyGJCQ8nMWl96WBzimFq0",
+          },
+        },
+        httpEndpoint: envSettings.GRAPHQL_URL,
+      },
+    },
+  },
   css: [
     // CSS file in the project
     "~/assets/scss/main.scss",
