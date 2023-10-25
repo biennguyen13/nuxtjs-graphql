@@ -1,6 +1,6 @@
 // https://nuxt.com/docs/api/configuration/nuxt-config
-const environment = process.env.ENV_MODE;
-const envSettings = require(`./env.${environment ?? "production"}.js`);
+const environment = process.env.ENV_MODE
+const envSettings = require(`./env.${environment ?? "production"}.js`)
 
 export default defineNuxtConfig({
   devtools: { enabled: false },
@@ -16,7 +16,7 @@ export default defineNuxtConfig({
   ssr: false,
   app: {
     head: {
-      title: "JPMA",
+      title: "Nuxjs",
       htmlAttrs: {
         lang: "en",
       },
@@ -50,4 +50,4 @@ export default defineNuxtConfig({
     // CSS file in the project
     "~/assets/scss/main.scss",
   ],
-});
+})
