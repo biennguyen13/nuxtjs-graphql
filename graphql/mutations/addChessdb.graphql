@@ -1,0 +1,13 @@
+mutation AddChessdb($FEN: String!, $value: String!) {
+  addChessdb(FEN: $FEN, value: $value) {
+    ... on Chessdb {
+      id
+      vkey
+      vFEN
+      value
+    }
+    ... on Error {
+      message
+    }
+  }
+}
