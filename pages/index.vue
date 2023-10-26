@@ -1,7 +1,9 @@
 <template>
   <button @click="handleLogin">login</button>
-  <button @click="handleaddChessdb">addChessdb</button>
+  <button @click="handleTest">test</button>
+  <div></div>
   <button @click="handleGetXapiCdbToken">get token cdb</button>
+  <button @click="handleaddChessdb">addChessdb</button>
 </template>
 
 <script lang="ts" setup>
@@ -79,6 +81,21 @@ const handleaddChessdb = async () => {
   } catch (e) {
     console.log("Error: " + e)
   }
+}
+
+const handleTest = () => {
+  const { onResult, refetch } = useQuery(
+    gql`
+      ${queryBook}
+    `,
+    { FEN: "rnbakabnr/9/1c5c1/p1p1p1p1p/9/9/P1P1P1P1P/1C5C1/9/RNBAKABNR w" }
+  )
+  onResult((...e) => {
+    console.log(e)
+  })
+  setTimeout(() => {
+    refetch()
+  }, 3000)
 }
 
 // $apolloClient
