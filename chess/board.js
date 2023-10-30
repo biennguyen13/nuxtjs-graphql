@@ -1802,6 +1802,7 @@ export default class Board extends EventTarget {
 
     // Pieces
     let pieceMouseDown = function (evt) {
+      console.log(evt)
       this.clickSquare(evt.target.XiSqr)
     }.bind(this)
     let pieceDragStart = function (evt) {

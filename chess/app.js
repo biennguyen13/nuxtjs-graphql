@@ -102,7 +102,6 @@ XiangQi.prototype.init = function (computer = true, skill = 0, cnDBlevel = 0) {
 XiangQi.prototype.genComputerMove = function () {
   if (this.level > 0) {
     if (this.board.computerMove()) {
-      console.log('genComputerMove')
       this.board.triggerBusy(true)
       if (this.current_level_move === this.cndbMoves[this.level].length) {
         this.current_level_move = 0
@@ -865,6 +864,18 @@ XiangQi.prototype.parseChinaDBResult = function (result) {
     return result.substr(5, 4)
   }
   return ""
+}
+
+XiangQi.prototype.makeMove = function (src, tgr) {
+  document
+    .querySelector(`[xisqr="${src}"]`)
+    ?.dispatchEvent(new Event("mousedown"))
+
+  setTimeout(() => {
+    document
+      .querySelector(`[xisqr="${tgr}"]`)
+      ?.dispatchEvent(new Event("mousedown"))
+  }, 1)
 }
 
 export default XiangQi
