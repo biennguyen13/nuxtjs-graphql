@@ -176,15 +176,15 @@ XiangQi.prototype.start = function (
   fen = "rnbakabnr/9/1c5c1/p1p1p1p1p/9/9/P1P1P1P1P/1C5C1/9/RNBAKABNR w"
 ) {
   this.setStartFen(fen, redFirst)
-  if (parseInt(cnDBLevel) === 0) {
-    this.board = new Board(this.elBoard, redFirst, false, fen)
-    this.resize(this.elGame, this.elBoard, this.board)
-    this.init(true, 2, 0)
-  } else {
-    this.board = new Board(this.elBoard, redFirst, true, fen)
-    this.resize(this.elGame, this.elBoard, this.board)
-    this.init(false, 2, cnDBLevel)
-  }
+  // if (parseInt(cnDBLevel) === 0) {
+  //   this.board = new Board(this.elBoard, redFirst, false, fen)
+  //   this.resize(this.elGame, this.elBoard, this.board)
+  //   this.init(true, 2, 0)
+  // } else {
+  this.board = new Board(this.elBoard, redFirst, true, fen)
+  this.resize(this.elGame, this.elBoard, this.board)
+  this.init(false, 2, cnDBLevel)
+  // }
 
   window.addEventListener(
     "resize",

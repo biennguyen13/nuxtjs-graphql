@@ -19,7 +19,7 @@ You should have received a copy of the GNU General Public License along
 with this program; if not, write to the Free Software Foundation, Inc.,
 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 */
-import DAT from './DAT'
+import DAT from "./DAT"
 
 const DAT_LEN = ~~(DAT.length / 3)
 
@@ -1840,12 +1840,12 @@ export default class Board extends EventTarget {
       let img = document.createElement("img")
       img.XiSqr = sq
       img.setAttribute("XiSqr", sq)
-      img.setAttribute("draggable", true)
+      // img.setAttribute("draggable", true)
       img.style.position = "absolute"
       img.addEventListener("mousedown", pieceMouseDown)
-      img.addEventListener("dragstart", pieceDragStart)
-      img.addEventListener("dragend", pieceDragEnd)
-      img.addEventListener("dragover", pieceDragOver)
+      // img.addEventListener("dragstart", pieceDragStart)
+      // img.addEventListener("dragend", pieceDragEnd)
+      // img.addEventListener("dragover", pieceDragOver)
       img.addEventListener("drop", pieceDrop)
       elImgs.appendChild(img)
       this.imgSquares.push(img)
@@ -1945,7 +1945,7 @@ export default class Board extends EventTarget {
     }
     this.busy = true
 
-    console.log("===========")
+    console.log("===========", "this.busy = true", (this.busy = true))
     if (!this.animated) {
       console.log("0000000000")
       this.postAddMove(mv, computerMove)
@@ -1988,6 +1988,7 @@ export default class Board extends EventTarget {
       }
     }.bind(this)
     requestAnimationFrame(anim)
+    this.busy = false
   }
 
   postAddMove(mv, computerMove) {
@@ -2143,7 +2144,7 @@ export default class Board extends EventTarget {
 
     this.dispatchEvent(new CustomEvent("move", { detail: moveDetails }))
 
-    this.response()
+    // this.response()
   }
 
   postMate(computerMove) {
