@@ -3,21 +3,9 @@
     <div id="board" style="width: 400px; height: 400px"></div>
     <div style="display: none">
       <!-- Try to preload sounds -->
-      <audio
-        preload="auto"
-        src="~/chessResources/assets/capture.wav"
-        id="sndCapture"
-      />
-      <audio
-        preload="auto"
-        src="~/chessResources/assets/check.wav"
-        id="sndCheck"
-      />
-      <audio
-        preload="auto"
-        src="~/chessResources/assets/move.wav"
-        id="sndMove"
-      />
+      <audio preload="auto" src="/chess/assets/capture.wav" id="sndCapture" />
+      <audio preload="auto" src="/chess/assets/check.wav" id="sndCheck" />
+      <audio preload="auto" src="/chess/assets/move.wav" id="sndMove" />
     </div>
   </div>
 </template>

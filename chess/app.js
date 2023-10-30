@@ -102,6 +102,7 @@ XiangQi.prototype.init = function (computer = true, skill = 0, cnDBlevel = 0) {
 XiangQi.prototype.genComputerMove = function () {
   if (this.level > 0) {
     if (this.board.computerMove()) {
+      console.log('genComputerMove')
       this.board.triggerBusy(true)
       if (this.current_level_move === this.cndbMoves[this.level].length) {
         this.current_level_move = 0
