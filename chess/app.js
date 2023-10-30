@@ -2,7 +2,7 @@ import * as notify from "./notify.js"
 import Board from "./board.js"
 // import axios from "https://cdnjs.cloudflare.com/ajax/libs/axios/1.6.0/axios.js";
 
-class XiangQi() {
+function XiangQi() {
   this.elGame = document.getElementById("xiangqi_game")
   this.elBoard = document.getElementById("board")
   this.elSndCapture = document.getElementById("sndCapture")
