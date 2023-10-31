@@ -45,7 +45,22 @@ export default defineNuxtConfig({
   devServer: {
     port: 3001,
   },
-  modules: ["@nuxtjs/apollo"],
+  modules: [
+    "@nuxtjs/apollo",
+    "@nuxt/ui",
+    "@nuxtjs/tailwindcss",
+    "@nuxtjs/color-mode",
+  ],
+  colorMode: {
+    preference: "light", // default value of $colorMode.preference
+    fallback: "system", // fallback value if not system preference found
+    hid: "nuxt-color-mode-script",
+    globalName: "__NUXT_COLOR_MODE__",
+    componentName: "ColorScheme",
+    classPrefix: "",
+    classSuffix: "-mode",
+    storageKey: "nuxt-color-mode",
+  },
   apollo: {
     autoImports: true,
     authType: "Bearer",
@@ -69,4 +84,13 @@ export default defineNuxtConfig({
     // CSS file in the project
     "~/assets/scss/main.scss",
   ],
+  tailwindcss: {
+    cssPath: "~/assets/css/tailwind.css",
+    configPath: "tailwind.config",
+    exposeConfig: false,
+    exposeLevel: 2,
+    config: {},
+    injectPosition: "first",
+    viewer: true,
+  },
 })
