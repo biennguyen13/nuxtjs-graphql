@@ -20,6 +20,8 @@
 </template>
 
 <script setup lang="ts">
+import queryBook from "~/graphql/queries/book.graphql"
+
 type Move = {
   id: number
   vmove: string
@@ -37,12 +39,27 @@ const state = reactive<{ moves: Move[] }>({
 
 watch(
   () => $chessBoard.currentFEN,
-  (newValue, oldValue) => {
+  async (newValue) => {
     if (newValue) {
-      console.log(newValue)
+      ;(await load()) || (await refetch({ FEN: newValue }))
     }
   }
 )
+
+const { refetch, load, onResult } = useLazyQuery(
+  gql`
+    ${queryBook}
+  `,
+  {
+    FEN:
+      $chessBoard.currentFEN ||
+      "rnbakabnr/9/1c5c1/p1p1p1p1p/9/9/P1P1P1P1P/1C5C1/9/RNBAKABNR w",
+  }
+)
+
+onResult(({ data }) => {
+  console.log(data)
+})
 </script>
 
 <style lang="scss" scoped>

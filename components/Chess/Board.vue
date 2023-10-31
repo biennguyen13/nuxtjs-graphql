@@ -49,6 +49,7 @@ const handler = {
   },
   onmove(FEN: string) {
     console.log("call back onmove", FEN)
+    state.currentFEN = FEN
   },
 }
 
