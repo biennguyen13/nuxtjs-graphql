@@ -9,10 +9,14 @@
       </tr>
     </thead>
     <tbody>
-      <tr v-for="{ id, vmove, vscore, vvalid, vmemo } in state.moves" :key="id">
+      <tr
+        v-for="{ id, vmove, vscore, vvalid, vmemo } in state.moves"
+        :key="id"
+        @click="handleClick({ id, vmove, vscore, vvalid, vmemo })"
+      >
         <td>{{ vmove.split("|")[0] }}</td>
         <td>{{ vscore }}</td>
-        <td>{{ vvalid }}</td>
+        <td>{{ vvalid ? "Yes" : "No" }}</td>
         <td>{{ vmemo }}</td>
       </tr>
     </tbody>
@@ -45,8 +49,7 @@ watch(
     }
   }
 )
-
-const { refetch, load, onResult } = useLazyQuery(
+const { refetch, load, onResult, onError } = useLazyQuery(
   gql`
     ${queryBook}
   `,
@@ -56,10 +59,17 @@ const { refetch, load, onResult } = useLazyQuery(
       "rnbakabnr/9/1c5c1/p1p1p1p1p/9/9/P1P1P1P1P/1C5C1/9/RNBAKABNR w",
   }
 )
-
 onResult(({ data }) => {
-  console.log(data)
+  state.moves = data?.book ?? []
 })
+onError((e) => {
+  console.log("Error: " + e)
+})
+
+const handleClick = ({ vmove }: Move) => {
+  const [src, tgr] = vmove.split("|")[1].split(":")
+  $chessBoard.xiangqiBoard.makeMove(src, tgr)
+}
 </script>
 
 <style lang="scss" scoped>
