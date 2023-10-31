@@ -13,12 +13,12 @@ import getXapiCdbToken from "~/graphql/queries/getXapiCdbToken.graphql"
 import mutationLogin from "~/graphql/mutations/login.graphql"
 import addChessdb from "~/graphql/mutations/addChessdb.graphql"
 // const colorMode = useColorMode()
-
 // console.log(colorMode.preference)
-const { onLogin } = useApollo()
 // definePageMeta({
 //   colorMode: "light",
 // })
+
+const { onLogin } = useApollo()
 const query = gql`
   ${mutationLogin}
 `

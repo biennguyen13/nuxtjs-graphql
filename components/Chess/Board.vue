@@ -1,9 +1,11 @@
 <template>
-  <div id="xiangqi_game">
+  <div id="xiangqi_game" class="max-w-[1200px] mx-auto">
     <div class="flex">
-      <div id="board" style="width: 400px; height: 400px"></div>
+      <div class="flex justify-center items-center max-w-[50%] flex-shrink-0">
+        <div id="board" style="width: 400px; height: 400px"></div>
+      </div>
       <div class="bg-slate-100 flex-grow">
-        <ControlPanel />
+        <ChessControlPanel />
       </div>
     </div>
     <div style="display: none">
@@ -16,14 +18,21 @@
 </template>
 
 <script setup lang="ts">
-import ControlPanel from "./ControlPanel.vue"
-
 import XiangQi from "~/chess/app"
 type XiangQiType = typeof XiangQi
 
-const state = reactive<{ xiangqiBoard: XiangQiType | any }>({
-  xiangqiBoard: null,
-})
+const state = reactive<{ xiangqiBoard: XiangQiType | any; currentFEN: string }>(
+  {
+    xiangqiBoard: null,
+    currentFEN: "",
+  }
+)
+const nuxtApp = useNuxtApp()
+try {
+  nuxtApp.provide("chessBoard", (name) => state)
+} catch (e) {
+  console.log("Error" + e)
+}
 
 const handler = {
   win() {
@@ -38,6 +47,9 @@ const handler = {
   firstMove() {
     console.log("call back firstMove")
   },
+  onmove(FEN: string) {
+    console.log("call back onmove", FEN)
+  },
 }
 
 onMounted(() => {
@@ -47,7 +59,8 @@ onMounted(() => {
     handler.win,
     handler.draw,
     handler.lose,
-    handler.firstMove
+    handler.firstMove,
+    handler.onmove
   )
 
   state.xiangqiBoard.start(
@@ -55,6 +68,10 @@ onMounted(() => {
     -1,
     "rnbakabnr/9/1c5c1/p1p1p1p1p/9/9/P1P1P1P1P/1C5C1/9/RNBAKABNR w"
   )
+
+  nextTick(() => {
+    state.currentFEN = state.xiangqiBoard.getFEN()
+  })
 
   // state.xiangqiBoard.makeMove(170, 58)
 })

@@ -4,5 +4,11 @@
   },
   "editor.quickSuggestions": {
     "strings": true
-  }
+  },
+  "tailwindCSS.experimental.configFile": "tailwind.config.js",
+  "tailwindCSS.experimental.classRegex": [
+    ["ui:\\s*{([^)]*)\\s*}", "[\"'`]([^\"'`]*).*?[\"'`]"],
+    ["/\\*ui\\*/\\s*{([^;]*)}", ":\\s*[\"'`]([^\"'`]*).*?[\"'`]"]
+  ],
+  "tailwindCSS.classAttributes": ["class", "className", "ngClass", "ui"]
 }

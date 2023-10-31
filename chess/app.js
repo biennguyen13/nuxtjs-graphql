@@ -12,6 +12,7 @@ function XiangQi() {
   this.loseCallback = null
   this.drawCallback = null
   this.firstMoveCallback = null
+  this.onmoveCallback = null
   this.level = 0
   this.current_level_move = 0
   this.startFen = ""
@@ -58,6 +59,7 @@ XiangQi.prototype.init = function (computer = true, skill = 0, cnDBlevel = 0) {
         self.firstMoveCallback()
       }
     }
+    self.onmoveCallback(self.getFEN())
   }
   this.board.addEventListener("move", onmove)
 
@@ -162,8 +164,8 @@ XiangQi.prototype.resize = function (
     height = ~~((min * 10) / 9) + 1
   }
 
-  elBoard.style.width = width + "px"
-  elBoard.style.height = height + "px"
+  elBoard.style.width = width * 0.75 + "px"
+  elBoard.style.height = height * 0.75 + "px"
 
   if (board) {
     board.resize()
@@ -200,12 +202,14 @@ XiangQi.prototype.setCallBack = function (
   winCallBack,
   loseCallBack,
   drawCallBack,
-  firstMoveCallback
+  firstMoveCallback,
+  onmoveCallback
 ) {
   this.winCallback = winCallBack
   this.loseCallback = loseCallBack
   this.drawCallback = drawCallBack
   this.firstMoveCallback = firstMoveCallback
+  this.onmoveCallback = onmoveCallback
 }
 
 XiangQi.prototype.setLevel = function (level = 3) {
@@ -792,6 +796,10 @@ XiangQi.prototype.getMoveList = function (moveList) {
   }
 
   return results
+}
+
+XiangQi.prototype.getFEN = function () {
+  return this.board.pos.toFen()
 }
 
 XiangQi.prototype.getNextBestMoveChinaDB = async function (currentFen) {

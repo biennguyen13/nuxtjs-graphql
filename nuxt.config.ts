@@ -51,6 +51,9 @@ export default defineNuxtConfig({
     "@nuxtjs/tailwindcss",
     "@nuxtjs/color-mode",
   ],
+  ui: {
+    global: true,
+  },
   colorMode: {
     preference: "light", // default value of $colorMode.preference
     fallback: "system", // fallback value if not system preference found
