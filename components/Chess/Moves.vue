@@ -11,11 +11,11 @@
         v-for="([redMove, blkMove], index) in movesChunkComputed"
         :key="index"
       >
-        <tr>
+        <tr @click="handleClick(redMove.index)">
           <td>{{ index + 1 }}</td>
           <td>{{ redMove.move }}</td>
         </tr>
-        <tr v-if="blkMove">
+        <tr v-if="blkMove" @click="handleClick(blkMove.index)">
           <td></td>
           <td>{{ blkMove?.move }}</td>
         </tr>
@@ -35,14 +35,20 @@ const vmovesList = computed(() => {
   return $chessBoard?.mvList || []
 })
 const srctgrMovesComputed = computed(() => {
-  return vmovesList.value.map((val, index) => ({
+  return vmovesList.value.map((val: number, index: number) => ({
     srctgr: nuxtApp.$utils.VmoveToSrcTgrObj(val),
     move: movesList.value[index],
+    vmove: vmovesList.value[index],
+    index,
   }))
 })
 const movesChunkComputed = computed(() => {
   return nuxtApp.$utils.chunk(srctgrMovesComputed.value, 2)
 })
+
+const handleClick = (index: number) => {
+  $chessBoard.handler.setFEN(index)
+}
 </script>
 
 <style lang="scss" scoped>

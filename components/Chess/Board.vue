@@ -21,15 +21,20 @@
 import XiangQi from "~/chess/app"
 type XiangQiType = typeof XiangQi
 
+const handler = {
+  setFEN(index: number) {
+    const FEN = state.FENList[index]
+    state.xiangqiBoard.restart(FEN)
+  },
+}
+
 const state = reactive<{
+  handler: any
   xiangqiBoard: XiangQiType | any
   currentFEN: string
-  mvList: any[]
-}>({
-  xiangqiBoard: null,
-  currentFEN: "",
-  mvList: [],
-})
+  mvList: number[]
+  FENList: string[]
+}>({ handler, xiangqiBoard: null, currentFEN: "", mvList: [], FENList: [] })
 
 const nuxtApp = useNuxtApp()
 try {
@@ -38,7 +43,7 @@ try {
   console.log("Error" + e)
 }
 
-const handler = {
+const callbackHandler = {
   win() {
     console.log("call back win")
   },
@@ -55,6 +60,7 @@ const handler = {
     state.currentFEN = FEN
     const mvList = state.xiangqiBoard.board.pos.mvList
     state.mvList.push(mvList[mvList.length - 1])
+    state.FENList.push(FEN)
   },
 }
 
@@ -62,11 +68,11 @@ onMounted(() => {
   state.xiangqiBoard = new XiangQi()
 
   state.xiangqiBoard.setCallBack(
-    handler.win,
-    handler.draw,
-    handler.lose,
-    handler.firstMove,
-    handler.onmove
+    callbackHandler.win,
+    callbackHandler.draw,
+    callbackHandler.lose,
+    callbackHandler.firstMove,
+    callbackHandler.onmove
   )
 
   state.xiangqiBoard.start(

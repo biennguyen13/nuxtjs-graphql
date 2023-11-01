@@ -2261,7 +2261,7 @@ export default class Board extends EventTarget {
     this.result = RESULT_UNKNOWN
     this.pos.fromFen(fen)
     this.flushBoard()
-    this.response()
+    // this.response()
   }
 
   retract() {

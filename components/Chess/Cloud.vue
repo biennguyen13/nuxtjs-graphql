@@ -46,9 +46,9 @@ watch(
         const { data } = await nuxtApp.$chessdbApi.queryall(_)
         state.moves = data
 
-        if (!(await handleaddChessdb()) && (await handleGetXapiCdbToken())) {
-          handleaddChessdb()
-        }
+        !(await handleaddChessdb()) &&
+          (await handleGetXapiCdbToken()) &&
+          (await handleaddChessdb())
       } catch (e) {
         console.log("Error: " + e)
       }
