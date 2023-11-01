@@ -1,10 +1,10 @@
 <template>
   <div id="xiangqi_game" class="max-w-[1200px] mx-auto">
-    <div class="flex">
-      <div class="flex justify-center items-center max-w-[50%] flex-shrink-0">
+    <div class="flex flex-wrap">
+      <div class="flex justify-center items-center flex-shrink-0">
         <div id="board" style="width: 400px; height: 400px"></div>
       </div>
-      <div class="bg-slate-100 flex-grow">
+      <div class="bg-slate-100 flex-grow min-w-[500px]">
         <ChessControlPanel />
       </div>
     </div>

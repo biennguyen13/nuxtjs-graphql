@@ -4,13 +4,13 @@
       <tr>
         <td>Move</td>
         <td>Score</td>
-        <td>Valid</td>
-        <td>Note</td>
+        <td>%Win</td>
+        <td>Comment</td>
       </tr>
     </thead>
-    <tbody class="bg-white">
+    <!-- <tbody class="bg-white">
       <tr
-        v-for="{ id, vmove, vscore, vvalid, vmemo } in state.moves"
+        v-for="{ id, vmove, vscore, vvalid, vmemo } in movesComputed"
         :key="id"
         @click="handleClick({ id, vmove, vscore, vvalid, vmemo })"
       >
@@ -19,58 +19,38 @@
         <td>{{ vvalid ? "Yes" : "No" }}</td>
         <td>{{ vmemo }}</td>
       </tr>
-    </tbody>
+    </tbody> -->
   </table>
 </template>
 
-<script setup lang="ts">
-import queryBook from "~/graphql/queries/book.graphql"
-
-type Move = {
-  id: number
-  vmove: string
-  vscore: number
-  vvalid: boolean
-  vmemo: string
-}
-
+<script setup>
 const nuxtApp = useNuxtApp()
 const $chessBoard = nuxtApp.$chessBoard?.()
 
-const state = reactive<{ moves: Move[] }>({
-  moves: [],
+const state = reactive({
+  moves: "",
 })
 
-const { refetch, load, onResult, onError } = useLazyQuery(
-  gql`
-    ${queryBook}
-  `,
-  {
-    FEN:
-      $chessBoard.currentFEN ||
-      "rnbakabnr/9/1c5c1/p1p1p1p1p/9/9/P1P1P1P1P/1C5C1/9/RNBAKABNR w",
-  }
-)
 watch(
   () => $chessBoard.currentFEN,
-  async (newValue) => {
-    if (newValue) {
-      ;(await load()) || (await refetch({ FEN: newValue }))
+  async (_) => {
+    if (_) {
+      try {
+        const { data } = await nuxtApp.$chessdbApi.queryall(_)
+        state.moves = data
+      } catch (e) {
+        console.log("Error: " + e)
+      }
     }
+  },
+  {
+    immediate: true,
   }
 )
 
-onResult(({ data }) => {
-  state.moves = data?.book ?? []
+const movesComputed = computed(() => {
+  return state.moves.split('|')
 })
-onError((e) => {
-  console.log("Error: " + e)
-})
-
-const handleClick = ({ vmove }: Move) => {
-  const [src, tgr] = vmove.split("|")[1].split(":")
-  $chessBoard.xiangqiBoard.makeMove(src, tgr)
-}
 </script>
 
 <style lang="scss" scoped>

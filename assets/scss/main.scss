@@ -6,6 +6,10 @@
 //   font-family: "Noto Sans JP", sans-serif;
 // }
 
+html {
+  overflow-x: hidden;
+}
+
 button {
   text-align: center;
   justify-content: center;
