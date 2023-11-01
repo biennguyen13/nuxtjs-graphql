@@ -73,7 +73,7 @@ const handleClick = (move) => {
 
 const handleaddChessdb = async () => {
   try {
-    const res = await nuxtApp.$apolloClient.mutate({
+    await nuxtApp.$apolloClient.mutate({
       mutation: gql`
         ${addChessdbMutation}
       `,
@@ -83,7 +83,6 @@ const handleaddChessdb = async () => {
       },
     })
 
-    console.log(res)
     return true
   } catch (e) {
     console.log("Error: " + e)

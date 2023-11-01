@@ -1,15 +1,13 @@
 <template>
   <div class="flex flex-col justify-end h-full">
     <div class="flex-grow overflow-y-auto max-h-[553px]">
-      <KeepAlive>
-        <component :is="componentComputed" v-show="state.component !== 2" />
-      </KeepAlive>
-
+      <ChessBook v-show="state.component === 0" />
       <ChessCloud v-show="state.component === 2" />
+      <ChessMoves v-show="state.component === 3" />
     </div>
     <div class="flex">
       <UButton
-        color="gray"
+        :color="state.component === 0 ? 'amber' : 'gray'"
         size="xl"
         variant="solid"
         label="BOOK"
@@ -17,7 +15,7 @@
         @click="state.component = 0"
       />
       <UButton
-        color="gray"
+        :color="state.component === 1 ? 'amber' : 'gray'"
         size="xl"
         variant="solid"
         label="ENGINE"
@@ -25,7 +23,7 @@
         @click="state.component = 1"
       />
       <UButton
-        color="gray"
+        :color="state.component === 2 ? 'amber' : 'gray'"
         size="xl"
         variant="solid"
         label="CLOUD"
@@ -33,7 +31,7 @@
         @click="state.component = 2"
       />
       <UButton
-        color="gray"
+        :color="state.component === 3 ? 'amber' : 'gray'"
         size="xl"
         variant="solid"
         label="MOVES"
@@ -47,14 +45,5 @@
 <script setup lang="ts">
 const state = reactive({
   component: 0,
-})
-
-const componentComputed = computed(() => {
-  switch (state.component) {
-    case 1:
-      return resolveComponent("ChessBook")
-    default:
-      return resolveComponent("ChessBook")
-  }
 })
 </script>

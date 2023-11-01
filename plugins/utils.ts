@@ -64,6 +64,19 @@ export default defineNuxtPlugin((_) => {
     return decSrc + ":" + decTgr
   }
 
+  const VmoveToSrcTgrObj = function (decMove: number) {
+    if (!decMove) return ""
+
+    const bin = decMove.toString(2).padStart(16, "0")
+
+    const [decSrc, decTgr] = [
+      parseInt(bin.slice(0, 8), 2),
+      parseInt(bin.slice(8, 16), 2),
+    ]
+
+    return { src: decSrc, tgr: decTgr }
+  }
+
   const convertChessdbMoves = function (moves: string) {
     if (!moves) return ""
 
@@ -83,12 +96,20 @@ export default defineNuxtPlugin((_) => {
     return data
   }
 
+  const chunk = function (array: [], size: number) {
+    return [...Array(Math.ceil(array.length / size))].map((_) =>
+      array.splice(0, size)
+    )
+  }
+
   return {
     provide: {
       utils: {
         VmoveToSrcTgr,
         moveToVmove,
         convertChessdbMoves,
+        VmoveToSrcTgrObj,
+        chunk,
       },
     },
   }

@@ -21,12 +21,16 @@
 import XiangQi from "~/chess/app"
 type XiangQiType = typeof XiangQi
 
-const state = reactive<{ xiangqiBoard: XiangQiType | any; currentFEN: string }>(
-  {
-    xiangqiBoard: null,
-    currentFEN: "",
-  }
-)
+const state = reactive<{
+  xiangqiBoard: XiangQiType | any
+  currentFEN: string
+  mvList: any[]
+}>({
+  xiangqiBoard: null,
+  currentFEN: "",
+  mvList: [],
+})
+
 const nuxtApp = useNuxtApp()
 try {
   nuxtApp.provide("chessBoard", (name) => state)
@@ -49,6 +53,8 @@ const handler = {
   },
   onmove(FEN: string) {
     state.currentFEN = FEN
+    const mvList = state.xiangqiBoard.board.pos.mvList
+    state.mvList.push(mvList[mvList.length - 1])
   },
 }
 
