@@ -64,11 +64,31 @@ export default defineNuxtPlugin((_) => {
     return decSrc + ":" + decTgr
   }
 
+  const convertChessdbMoves = function (moves: string) {
+    if (!moves) return ""
+
+    const data = moves.split("|").map((item) => {
+      const obj: any = {}
+      item.split(",").forEach((_item) => {
+        const [key, value] = _item.split(":")
+        if (key === "move") {
+          obj[key] = value + "|" + VmoveToSrcTgr(moveToVmove(value) as number)
+        } else {
+          obj[key] = value
+        }
+      })
+      return obj
+    })
+
+    return data
+  }
+
   return {
     provide: {
       utils: {
         VmoveToSrcTgr,
         moveToVmove,
+        convertChessdbMoves,
       },
     },
   }

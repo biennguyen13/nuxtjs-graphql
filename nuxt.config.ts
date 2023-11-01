@@ -1,11 +1,8 @@
 // https://nuxt.com/docs/api/configuration/nuxt-config
-const environment = process.env.ENV_MODE
-const envSettings = require(`./env.${environment ?? "production"}.js`)
-
 export default defineNuxtConfig({
   devtools: { enabled: false },
   runtimeConfig: {
-    public: { ...envSettings },
+    public: { GRAPHQL_URL: process.env.GRAPHQL_URL },
   },
   postcss: {
     plugins: {
@@ -79,7 +76,7 @@ export default defineNuxtConfig({
             // "X-Api-Cdb-token": "",
           },
         },
-        httpEndpoint: envSettings.GRAPHQL_URL,
+        httpEndpoint: process.env.GRAPHQL_URL,
       },
     },
   },

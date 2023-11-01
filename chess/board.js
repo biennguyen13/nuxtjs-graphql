@@ -1802,7 +1802,7 @@ export default class Board extends EventTarget {
 
     // Pieces
     let pieceMouseDown = function (evt) {
-      console.log(evt)
+      // console.log(evt)
       this.clickSquare(evt.target.XiSqr)
     }.bind(this)
     let pieceDragStart = function (evt) {
@@ -1939,20 +1939,20 @@ export default class Board extends EventTarget {
   }
 
   addMove(mv, computerMove) {
-    console.log`addMove`
+    // console.log`addMove`
     if (!this.pos.legalMove(mv) || !this.pos.makeMove(mv)) {
       //console.log('Illegal move');
       return
     }
     this.busy = true
 
-    console.log("===========", "this.busy = true", (this.busy = true))
+    // console.log("===========", "this.busy = true", (this.busy = true))
     if (!this.animated) {
-      console.log("0000000000")
+      // console.log("0000000000")
       this.postAddMove(mv, computerMove)
       return
     }
-    console.log(1111111111)
+    // console.log(1111111111)
 
     let srcStyle = this.imgSquares[this.flipped(SRC(mv))].style
     let dstStyle = this.imgSquares[this.flipped(DST(mv))].style
@@ -1967,7 +1967,7 @@ export default class Board extends EventTarget {
     if (steps > MAX_STEPS) {
       steps = MAX_STEPS
     }
-    console.log(22222222222)
+    // console.log(22222222222)
     srcStyle.zIndex = 256
     let anim = function () {
       if (!steps) {
@@ -2161,7 +2161,7 @@ export default class Board extends EventTarget {
   }
 
   response() {
-    console.log`response`
+    // console.log`response`
     if (!this.computerMove()) {
       // player's move
       this.busy = false
@@ -2210,7 +2210,7 @@ export default class Board extends EventTarget {
   }
 
   clickSquare(sq_) {
-    console.log`clickSquare`
+    // console.log`clickSquare`
     if (this.busy || this.result !== RESULT_UNKNOWN) {
       return
     }

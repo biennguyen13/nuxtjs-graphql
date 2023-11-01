@@ -2,8 +2,8 @@ import axios from "axios"
 
 export default defineNuxtPlugin((app) => {
   const instance = axios.create({
-    baseURL: app.$config.public.API_URL,
-    // config.headers["X-Api-Key"] = app.$config.public.API_KEY_VALUE
+    baseURL: process.env.API_URL,
+    // config.headers["X-Api-Key"] = process.env.API_KEY_VALUE
   })
 
   instance.interceptors.request.use(function (config) {

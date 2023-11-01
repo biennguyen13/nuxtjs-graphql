@@ -8,18 +8,18 @@
         <td>Comment</td>
       </tr>
     </thead>
-    <!-- <tbody class="bg-white">
+    <tbody class="bg-white">
       <tr
-        v-for="{ id, vmove, vscore, vvalid, vmemo } in movesComputed"
-        :key="id"
-        @click="handleClick({ id, vmove, vscore, vvalid, vmemo })"
+        v-for="{ move, score, winrate, note } in movesComputed"
+        :key="move"
+        @click="handleClick(move)"
       >
-        <td>{{ vmove.split("|")[0] }}</td>
-        <td>{{ vscore }}</td>
-        <td>{{ vvalid ? "Yes" : "No" }}</td>
-        <td>{{ vmemo }}</td>
+        <td>{{ move.split("|")[0] }}</td>
+        <td>{{ score }}</td>
+        <td>{{ winrate }}</td>
+        <td>{{ note }}</td>
       </tr>
-    </tbody> -->
+    </tbody>
   </table>
 </template>
 
@@ -29,18 +29,21 @@ const $chessBoard = nuxtApp.$chessBoard?.()
 
 const state = reactive({
   moves: "",
+  loading: false,
 })
 
 watch(
   () => $chessBoard.currentFEN,
   async (_) => {
     if (_) {
+      state.loading = true
       try {
         const { data } = await nuxtApp.$chessdbApi.queryall(_)
         state.moves = data
       } catch (e) {
         console.log("Error: " + e)
       }
+      state.loading = false
     }
   },
   {
@@ -49,8 +52,15 @@ watch(
 )
 
 const movesComputed = computed(() => {
-  return state.moves.split('|')
+  return nuxtApp.$utils.convertChessdbMoves(state.moves)
 })
+
+const handleClick = (move) => {
+  if (state.loading) return
+
+  const [src, tgr] = move.split("|")[1].split(":")
+  $chessBoard.xiangqiBoard.makeMove(src, tgr)
+}
 </script>
 
 <style lang="scss" scoped>

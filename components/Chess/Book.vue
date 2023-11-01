@@ -41,7 +41,7 @@ const state = reactive<{ moves: Move[] }>({
   moves: [],
 })
 
-const { refetch, load, onResult, onError } = useLazyQuery(
+const { refetch, load, onResult, onError, loading } = useLazyQuery(
   gql`
     ${queryBook}
   `,
@@ -68,6 +68,7 @@ onError((e) => {
 })
 
 const handleClick = ({ vmove }: Move) => {
+  if (loading.value) return
   const [src, tgr] = vmove.split("|")[1].split(":")
   $chessBoard.xiangqiBoard.makeMove(src, tgr)
 }

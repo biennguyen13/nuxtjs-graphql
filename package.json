@@ -3,9 +3,9 @@
   "private": true,
   "type": "module",
   "scripts": {
-    "dev": "cross-env ENV_MODE=development nuxt dev",
-    "dev:prd": "cross-env ENV_MODE=production nuxt dev",
-    "build": "nuxt build",
+    "dev": "npx nuxt dev --dotenv .env.local",
+    "dev:prd": "npx nuxt dev --dotenv .env.production",
+    "build": "nuxt build --dotenv .env.production",
     "generate": "nuxt generate",
     "preview": "nuxt preview",
     "postinstall": "nuxt prepare"
