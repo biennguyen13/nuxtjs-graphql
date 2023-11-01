@@ -24,8 +24,13 @@
 </template>
 
 <script setup>
+import getXapiCdbTokenQuery from "~/graphql/queries/getXapiCdbToken.graphql"
+import addChessdbMutation from "~/graphql/mutations/addChessdb.graphql"
+
+import { addCookieValue } from "~/helpers/cookies"
+
 const nuxtApp = useNuxtApp()
-const $chessBoard = nuxtApp.$chessBoard?.()
+const $chessBoard = nuxtApp.$chessBoard()
 
 const state = reactive({
   moves: "",
@@ -40,6 +45,10 @@ watch(
       try {
         const { data } = await nuxtApp.$chessdbApi.queryall(_)
         state.moves = data
+
+        if (!(await handleaddChessdb()) && (await handleGetXapiCdbToken())) {
+          handleaddChessdb()
+        }
       } catch (e) {
         console.log("Error: " + e)
       }
@@ -60,6 +69,43 @@ const handleClick = (move) => {
 
   const [src, tgr] = move.split("|")[1].split(":")
   $chessBoard.xiangqiBoard.makeMove(src, tgr)
+}
+
+const handleaddChessdb = async () => {
+  try {
+    const res = await nuxtApp.$apolloClient.mutate({
+      mutation: gql`
+        ${addChessdbMutation}
+      `,
+      variables: {
+        FEN: $chessBoard.currentFEN,
+        value: state.moves,
+      },
+    })
+
+    console.log(res)
+    return true
+  } catch (e) {
+    console.log("Error: " + e)
+    return false
+  }
+}
+const handleGetXapiCdbToken = async () => {
+  try {
+    const { data } = await nuxtApp.$apolloClient.query({
+      query: gql`
+        ${getXapiCdbTokenQuery}
+      `,
+    })
+
+    if (data?.getXapiCdbToken?.token) {
+      addCookieValue("X-api-cdb-token", data?.getXapiCdbToken?.token)
+      return true
+    }
+  } catch (e) {
+    console.log("Error: " + e)
+    return false
+  }
 }
 </script>
 

@@ -20,7 +20,7 @@ export default defineNuxtPlugin((app) => {
       headers: {
         ...headers,
         "X-api-cdb-token": getCookieValue("X-api-cdb-token") || "",
-        Authorization: getCookieValue("apollo:graphql.token") || "",
+        // Authorization: getCookieValue("apollo:graphql.token") || "",
       },
     }))
     return forward(operation)
