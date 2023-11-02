@@ -37,7 +37,7 @@
 
 <script setup lang="ts">
 import { getCurrentInstance } from "vue"
-const _vue = getCurrentInstance()
+const _this = getCurrentInstance()
 
 const nuxtApp = useNuxtApp()
 const $chessBoard = nuxtApp.$chessBoard()
@@ -71,14 +71,6 @@ const movesChunkComputed = computed(() => {
   return nuxtApp.$utils.chunk(srctgrMovesComputed.value, 2)
 })
 
-watch(
-  () => movesChunkComputed.value,
-  (_) => {
-    console.log("%cMoves.vue line:73 _", "color: #007acc;", _)
-  },
-  { deep: true }
-)
-
 const handleClick = (_index: number, _move: any) => {
   movesChunkComputed.value
     .flat()
@@ -95,8 +87,21 @@ const handleClick = (_index: number, _move: any) => {
     $chessBoard.handler.drawSquare(src, true)
     $chessBoard.handler.drawSquare(tgr, true)
   }
-  _vue?.proxy?.$forceUpdate()
+  _this?.proxy?.$forceUpdate()
 }
+
+const getCurrentSelectedMove = () => {
+  return (
+    movesChunkComputed.value
+      .flat()
+      .filter((item) => !!item)
+      .find((item) => item.select) || null
+  )
+}
+
+onBeforeMount(() => {
+  $chessBoard.childrends.movesComp = _this
+})
 </script>
 
 <style lang="scss" scoped>

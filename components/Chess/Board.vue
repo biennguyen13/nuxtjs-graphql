@@ -18,8 +18,13 @@
 </template>
 
 <script setup lang="ts">
+import { getCurrentInstance } from "vue"
+
 import XiangQi from "~/chess/app"
 type XiangQiType = typeof XiangQi
+
+const _this = getCurrentInstance()
+const nuxtApp = useNuxtApp()
 
 const handler = {
   setFEN(index: number, move: number) {
@@ -31,16 +36,24 @@ const handler = {
     state.xiangqiBoard.board.drawSquare(sq, selected)
   },
 }
+const childrends: { movesComp: any | null } = { movesComp: null }
 
 const state = reactive<{
   handler: any
+  childrends: { movesComp: any | null }
   xiangqiBoard: XiangQiType | any
   currentFEN: string
   mvList: number[]
   FENList: string[]
-}>({ handler, xiangqiBoard: null, currentFEN: "", mvList: [], FENList: [] })
+}>({
+  handler,
+  childrends,
+  xiangqiBoard: null,
+  currentFEN: "",
+  mvList: [],
+  FENList: [],
+})
 
-const nuxtApp = useNuxtApp()
 try {
   nuxtApp.provide("chessBoard", (name) => state)
 } catch (e) {
@@ -63,6 +76,15 @@ const callbackHandler = {
   onmove(FEN: string) {
     state.currentFEN = FEN
     const mvList = state.xiangqiBoard.board.pos.mvList
+
+    const currentSltedMove =
+      state.childrends.movesComp?.setupState?.getCurrentSelectedMove()
+
+    if (currentSltedMove) {
+      state.FENList = state.FENList.slice(0, currentSltedMove.index + 1)
+      state.mvList = state.mvList.slice(0, currentSltedMove.index)
+    }
+
     state.mvList.push(mvList[mvList.length - 1])
     state.FENList.push(FEN)
   },
