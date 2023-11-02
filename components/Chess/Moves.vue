@@ -11,11 +11,11 @@
         v-for="([redMove, blkMove], index) in movesChunkComputed"
         :key="index"
       >
-        <tr @click="handleClick(redMove.index)">
+        <tr @click="handleClick(redMove.index, redMove)">
           <td>{{ index }}</td>
           <td>{{ redMove.move }}</td>
         </tr>
-        <tr v-if="blkMove" @click="handleClick(blkMove.index)">
+        <tr v-if="blkMove" @click="handleClick(blkMove.index, blkMove)">
           <td></td>
           <td>{{ blkMove?.move }}</td>
         </tr>
@@ -56,8 +56,15 @@ const movesChunkComputed = computed(() => {
   ]
 })
 
-const handleClick = (index: number) => {
-  $chessBoard.handler.setFEN(index)
+const handleClick = (_index: number, _move: any) => {
+  $chessBoard.handler.setFEN(_index, _move.vmove)
+  const {
+    srctgr: { src, tgr },
+  } = _move
+  if (src && tgr) {
+    $chessBoard.handler.drawSquare(src, true)
+    $chessBoard.handler.drawSquare(tgr, true)
+  }
 }
 </script>
 

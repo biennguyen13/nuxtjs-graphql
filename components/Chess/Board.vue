@@ -22,9 +22,13 @@ import XiangQi from "~/chess/app"
 type XiangQiType = typeof XiangQi
 
 const handler = {
-  setFEN(index: number) {
+  setFEN(index: number, move: number) {
     const FEN = state.FENList[index]
     state.xiangqiBoard.restart(FEN)
+    state.xiangqiBoard.board.mvLast = move
+  },
+  drawSquare(sq: number | string, selected: boolean) {
+    state.xiangqiBoard.board.drawSquare(sq, selected)
   },
 }
 
