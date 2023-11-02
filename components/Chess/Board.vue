@@ -82,7 +82,9 @@ onMounted(() => {
   )
 
   nextTick(() => {
-    state.currentFEN = state.xiangqiBoard.getFEN()
+    const FEN = state.xiangqiBoard.getFEN()
+    state.currentFEN = FEN
+    state.FENList.push(FEN)
   })
 
   // state.xiangqiBoard.makeMove(170, 58)

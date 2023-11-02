@@ -1,26 +1,39 @@
 <template>
-  <table>
-    <thead class="sticky top-0 left-0 bg-white">
-      <tr>
-        <td>Move</td>
-        <td>Score</td>
-        <td>%Win</td>
-        <td>Comment</td>
-      </tr>
-    </thead>
-    <tbody class="bg-white">
-      <tr
-        v-for="{ move, score, winrate, note } in movesComputed"
-        :key="move"
-        @click="handleClick(move)"
+  <div>
+    <table>
+      <thead class="sticky top-0 left-0 bg-white">
+        <tr>
+          <td>Move</td>
+          <td>Score</td>
+          <td>%Win</td>
+          <td>Comment</td>
+        </tr>
+      </thead>
+      <tbody class="bg-white">
+        <tr
+          v-for="{ move, score, winrate, note } in movesComputed"
+          :key="move"
+          @click="handleClick(move)"
+        >
+          <td>{{ move.split("|")[0] }}</td>
+          <td>{{ score }}</td>
+          <td>{{ winrate }}</td>
+          <td>{{ note }}</td>
+        </tr>
+      </tbody>
+    </table>
+    <div class="text-center mt-4">
+      <UButton
+        v-if="!state.moves"
+        color="primary"
+        size="xl"
+        variant="solid"
+        @click="handleGetCloud($chessBoard.currentFEN)"
       >
-        <td>{{ move.split("|")[0] }}</td>
-        <td>{{ score }}</td>
-        <td>{{ winrate }}</td>
-        <td>{{ note }}</td>
-      </tr>
-    </tbody>
-  </table>
+        Reload
+      </UButton>
+    </div>
+  </div>
 </template>
 
 <script setup>
@@ -39,19 +52,14 @@ const state = reactive({
 
 watch(
   () => $chessBoard.currentFEN,
-  async (_) => {
-    if (_) {
+  async (FEN) => {
+    if (FEN && !state.loading) {
       state.loading = true
-      try {
-        const { data } = await nuxtApp.$chessdbApi.queryall(_)
-        state.moves = data
 
-        !(await handleaddChessdb()) &&
-          (await handleGetXapiCdbToken()) &&
-          (await handleaddChessdb())
-      } catch (e) {
-        console.log("Error: " + e)
-      }
+      try {
+        handleGetCloud(FEN)
+      } catch (e) {}
+
       state.loading = false
     }
   },
@@ -71,6 +79,29 @@ const handleClick = (move) => {
   $chessBoard.xiangqiBoard.makeMove(src, tgr)
 }
 
+const handleGetCloud = async (FEN) => {
+  try {
+    const { data } = await nuxtApp.$chessdbApi.queryall(FEN)
+    if (data.includes("move:")) {
+      state.moves = data
+
+      !(await handleaddChessdb()) &&
+        (await handleGetXapiCdbToken()) &&
+        (await handleaddChessdb())
+    } else {
+      state.moves = ""
+      // await new Promise(async (res) => {
+      //   setTimeout(() => {
+      //     handleGetCloud(FEN).then((_) => {
+      //       res(true)
+      //     })
+      //   }, 1000)
+      // })
+    }
+  } catch (e) {
+    console.log("Error: " + e)
+  }
+}
 const handleaddChessdb = async () => {
   try {
     await nuxtApp.$apolloClient.mutate({

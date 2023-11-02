@@ -12,7 +12,7 @@
         :key="index"
       >
         <tr @click="handleClick(redMove.index)">
-          <td>{{ index + 1 }}</td>
+          <td>{{ index }}</td>
           <td>{{ redMove.move }}</td>
         </tr>
         <tr v-if="blkMove" @click="handleClick(blkMove.index)">
@@ -39,11 +39,21 @@ const srctgrMovesComputed = computed(() => {
     srctgr: nuxtApp.$utils.VmoveToSrcTgrObj(val),
     move: movesList.value[index],
     vmove: vmovesList.value[index],
-    index,
+    index: index + 1,
   }))
 })
 const movesChunkComputed = computed(() => {
-  return nuxtApp.$utils.chunk(srctgrMovesComputed.value, 2)
+  return [
+    [
+      {
+        srctgr: 0,
+        move: 0,
+        vmove: 0,
+        index: 0,
+      },
+    ],
+    ...nuxtApp.$utils.chunk(srctgrMovesComputed.value, 2),
+  ]
 })
 
 const handleClick = (index: number) => {
