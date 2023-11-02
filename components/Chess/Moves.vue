@@ -11,11 +11,22 @@
         v-for="([redMove, blkMove], index) in movesChunkComputed"
         :key="index"
       >
-        <tr @click="handleClick(redMove.index, redMove)">
+        <tr
+          @click="handleClick(redMove.index, redMove)"
+          :class="{
+            'bg-blue-300': redMove.select,
+          }"
+        >
           <td>{{ index }}</td>
           <td>{{ redMove.move }}</td>
         </tr>
-        <tr v-if="blkMove" @click="handleClick(blkMove.index, blkMove)">
+        <tr
+          v-if="blkMove"
+          @click="handleClick(blkMove.index, blkMove)"
+          :class="{
+            'bg-blue-300': blkMove.select,
+          }"
+        >
           <td></td>
           <td>{{ blkMove?.move }}</td>
         </tr>
@@ -25,6 +36,9 @@
 </template>
 
 <script setup lang="ts">
+import { getCurrentInstance } from "vue"
+const _vue = getCurrentInstance()
+
 const nuxtApp = useNuxtApp()
 const $chessBoard = nuxtApp.$chessBoard()
 
@@ -35,28 +49,44 @@ const vmovesList = computed(() => {
   return $chessBoard?.mvList || []
 })
 const srctgrMovesComputed = computed(() => {
-  return vmovesList.value.map((val: number, index: number) => ({
-    srctgr: nuxtApp.$utils.VmoveToSrcTgrObj(val),
-    move: movesList.value[index],
-    vmove: vmovesList.value[index],
-    index: index + 1,
-  }))
-})
-const movesChunkComputed = computed(() => {
   return [
-    [
-      {
-        srctgr: 0,
-        move: 0,
-        vmove: 0,
-        index: 0,
-      },
-    ],
-    ...nuxtApp.$utils.chunk(srctgrMovesComputed.value, 2),
+    {
+      srctgr: 0,
+      move: 0,
+      vmove: 0,
+      index: 0,
+      select: false,
+    },
+    null,
+    ...vmovesList.value.map((val: number, index: number) => ({
+      srctgr: nuxtApp.$utils.VmoveToSrcTgrObj(val),
+      move: movesList.value[index],
+      vmove: vmovesList.value[index],
+      index: index + 1,
+      select: false,
+    })),
   ]
 })
+const movesChunkComputed = computed(() => {
+  return nuxtApp.$utils.chunk(srctgrMovesComputed.value, 2)
+})
+
+watch(
+  () => movesChunkComputed.value,
+  (_) => {
+    console.log("%cMoves.vue line:73 _", "color: #007acc;", _)
+  },
+  { deep: true }
+)
 
 const handleClick = (_index: number, _move: any) => {
+  movesChunkComputed.value
+    .flat()
+    .filter((item) => !!item)
+    .forEach((move) => {
+      move.select = false
+    })
+  _move.select = true
   $chessBoard.handler.setFEN(_index, _move.vmove)
   const {
     srctgr: { src, tgr },
@@ -65,6 +95,7 @@ const handleClick = (_index: number, _move: any) => {
     $chessBoard.handler.drawSquare(src, true)
     $chessBoard.handler.drawSquare(tgr, true)
   }
+  _vue?.proxy?.$forceUpdate()
 }
 </script>
 
