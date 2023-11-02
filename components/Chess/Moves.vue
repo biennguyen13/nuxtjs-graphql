@@ -82,7 +82,7 @@ const handleClick = (_index: number, _move: any) => {
   })
   _move.select = true
 
-  $chessBoard.handler.setFEN(_index, _move.vmove)
+  $chessBoard.handler.restartBoard(_index, _move.vmove)
 
   const {
     srctgr: { src, tgr },

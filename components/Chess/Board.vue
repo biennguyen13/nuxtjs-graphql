@@ -5,16 +5,12 @@
         color="primary"
         size="xl"
         variant="solid"
-        @click="state.childrends.movesComp?.setupState?.makePreviousMove()"
+        @click="handlePrevious"
         >{{ "<" }}</UButton
       >
-      <UButton
-        color="primary"
-        size="xl"
-        variant="solid"
-        @click="state.childrends.movesComp?.setupState?.makeNextMove()"
-        >{{ ">" }}</UButton
-      >
+      <UButton color="primary" size="xl" variant="solid" @click="handleNext">{{
+        ">"
+      }}</UButton>
     </div>
     <div class="flex flex-wrap">
       <div class="flex justify-center items-center flex-shrink-0">
@@ -44,10 +40,11 @@ const nuxtApp = useNuxtApp()
 
 const childrends: { movesComp: any | null } = { movesComp: null }
 const handler = {
-  setFEN(index: number, move: number) {
+  restartBoard(index: number, move: number) {
     const FEN = state.FENList[index]
     state.xiangqiBoard.restart(FEN)
     state.xiangqiBoard.board.mvLast = move
+    state.currentFEN = FEN
   },
   drawSquare(sq: number | string, selected: boolean) {
     state.xiangqiBoard.board.drawSquare(sq, selected)
@@ -90,6 +87,7 @@ const state = reactive<{
   currentFEN: string
   mvList: number[]
   FENList: string[]
+  loading: boolean
 }>({
   handler,
   childrends,
@@ -97,12 +95,34 @@ const state = reactive<{
   currentFEN: "",
   mvList: [],
   FENList: [],
+  loading: false,
 })
 
 try {
   nuxtApp.provide("chessBoard", (name) => state)
 } catch (e) {
   console.log("Error" + e)
+}
+
+const handlePrevious = async () => {
+  if (state.loading) return
+
+  state.loading = true
+
+  state.childrends.movesComp?.setupState?.makePreviousMove()
+  await nuxtApp.$utils.wait()
+
+  state.loading = false
+}
+const handleNext = async () => {
+  if (state.loading) return
+
+  state.loading = true
+
+  state.childrends.movesComp?.setupState?.makeNextMove()
+  await nuxtApp.$utils.wait()
+
+  state.loading = false
 }
 
 onMounted(() => {
