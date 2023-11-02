@@ -1,5 +1,21 @@
 <template>
   <div id="xiangqi_game" class="max-w-[1200px] mx-auto">
+    <div class="flex gap-4 mb-4">
+      <UButton
+        color="primary"
+        size="xl"
+        variant="solid"
+        @click="state.childrends.movesComp?.setupState?.makePreviousMove()"
+        >{{ "<" }}</UButton
+      >
+      <UButton
+        color="primary"
+        size="xl"
+        variant="solid"
+        @click="state.childrends.movesComp?.setupState?.makeNextMove()"
+        >{{ ">" }}</UButton
+      >
+    </div>
     <div class="flex flex-wrap">
       <div class="flex justify-center items-center flex-shrink-0">
         <div id="board" style="width: 400px; height: 400px"></div>
@@ -26,6 +42,7 @@ type XiangQiType = typeof XiangQi
 const _this = getCurrentInstance()
 const nuxtApp = useNuxtApp()
 
+const childrends: { movesComp: any | null } = { movesComp: null }
 const handler = {
   setFEN(index: number, move: number) {
     const FEN = state.FENList[index]
@@ -36,30 +53,6 @@ const handler = {
     state.xiangqiBoard.board.drawSquare(sq, selected)
   },
 }
-const childrends: { movesComp: any | null } = { movesComp: null }
-
-const state = reactive<{
-  handler: any
-  childrends: { movesComp: any | null }
-  xiangqiBoard: XiangQiType | any
-  currentFEN: string
-  mvList: number[]
-  FENList: string[]
-}>({
-  handler,
-  childrends,
-  xiangqiBoard: null,
-  currentFEN: "",
-  mvList: [],
-  FENList: [],
-})
-
-try {
-  nuxtApp.provide("chessBoard", (name) => state)
-} catch (e) {
-  console.log("Error" + e)
-}
-
 const callbackHandler = {
   win() {
     console.log("call back win")
@@ -88,6 +81,28 @@ const callbackHandler = {
     state.mvList.push(mvList[mvList.length - 1])
     state.FENList.push(FEN)
   },
+}
+
+const state = reactive<{
+  handler: any
+  childrends: { movesComp: any | null }
+  xiangqiBoard: XiangQiType | any
+  currentFEN: string
+  mvList: number[]
+  FENList: string[]
+}>({
+  handler,
+  childrends,
+  xiangqiBoard: null,
+  currentFEN: "",
+  mvList: [],
+  FENList: [],
+})
+
+try {
+  nuxtApp.provide("chessBoard", (name) => state)
+} catch (e) {
+  console.log("Error" + e)
 }
 
 onMounted(() => {

@@ -12,6 +12,7 @@
         :key="index"
       >
         <tr
+          :id="`_${_this?.uid}_${redMove.index}`"
           @click="handleClick(redMove.index, redMove)"
           :class="{
             'bg-blue-300': redMove.select,
@@ -22,6 +23,7 @@
         </tr>
         <tr
           v-if="blkMove"
+          :id="`_${_this?.uid}_${blkMove.index}`"
           @click="handleClick(blkMove.index, blkMove)"
           :class="{
             'bg-blue-300': blkMove.select,
@@ -70,16 +72,18 @@ const srctgrMovesComputed = computed(() => {
 const movesChunkComputed = computed(() => {
   return nuxtApp.$utils.chunk(srctgrMovesComputed.value, 2)
 })
+const movesChunkFlatComputed = computed(() => {
+  return movesChunkComputed.value.flat().filter((item) => !!item)
+})
 
 const handleClick = (_index: number, _move: any) => {
-  movesChunkComputed.value
-    .flat()
-    .filter((item) => !!item)
-    .forEach((move) => {
-      move.select = false
-    })
+  movesChunkFlatComputed.value.forEach((move) => {
+    move.select = false
+  })
   _move.select = true
+
   $chessBoard.handler.setFEN(_index, _move.vmove)
+
   const {
     srctgr: { src, tgr },
   } = _move
@@ -91,12 +95,31 @@ const handleClick = (_index: number, _move: any) => {
 }
 
 const getCurrentSelectedMove = () => {
-  return (
-    movesChunkComputed.value
-      .flat()
-      .filter((item) => !!item)
-      .find((item) => item.select) || null
-  )
+  return movesChunkFlatComputed.value.find((item) => item.select) || null
+}
+const makePreviousMove = () => {
+  const sltedMove =
+    getCurrentSelectedMove() ??
+    movesChunkFlatComputed.value[movesChunkFlatComputed.value.length - 1]
+
+  if (!sltedMove) return
+  const moveIndex = sltedMove.index - 1
+  if (moveIndex < 0) return
+
+  const id = `#_${_this?.uid}_${moveIndex}`
+  document.querySelector(id)?.click()
+}
+const makeNextMove = () => {
+  const sltedMove =
+    getCurrentSelectedMove() ??
+    movesChunkFlatComputed.value[movesChunkFlatComputed.value.length - 1]
+
+  if (!sltedMove) return
+  const moveIndex = sltedMove.index + 1
+  if (moveIndex >= movesChunkFlatComputed.value.length) return
+
+  const id = `#_${_this?.uid}_${moveIndex}`
+  document.querySelector(id)?.click()
 }
 
 onBeforeMount(() => {
