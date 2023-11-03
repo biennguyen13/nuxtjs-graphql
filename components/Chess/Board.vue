@@ -104,26 +104,12 @@ try {
   console.log("Error" + e)
 }
 
-const handlePrevious = async () => {
-  if (state.loading) return
-
-  state.loading = true
-
+const handlePrevious = nuxtApp.$utils.throttle(async () => {
   state.childrends.movesComp?.setupState?.makePreviousMove()
-  await nuxtApp.$utils.wait()
-
-  state.loading = false
-}
-const handleNext = async () => {
-  if (state.loading) return
-
-  state.loading = true
-
+}, 500)
+const handleNext = nuxtApp.$utils.throttle(async () => {
   state.childrends.movesComp?.setupState?.makeNextMove()
-  await nuxtApp.$utils.wait()
-
-  state.loading = false
-}
+}, 500)
 
 onMounted(() => {
   state.xiangqiBoard = new XiangQi()

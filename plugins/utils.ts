@@ -109,6 +109,38 @@ export default defineNuxtPlugin((_) => {
     })
   }
 
+  const debounce = function (fn, wait = 0) {
+    let timer
+    return function (...args) {
+      if (timer) {
+        clearTimeout(timer) // clear any pre-existing timer
+      }
+      const context = this // get the current context
+      return new Promise((res, rej) => {
+        timer = setTimeout(async () => {
+          try {
+            const result = await fn.apply(context, args) // call the function if time expires
+            res(result)
+          } catch (e) {
+            rej(e)
+          }
+        }, wait)
+      })
+    }
+  }
+
+  const throttle = function (fn, delay = 0) {
+    return (args) => {
+      if (fn.id) return
+
+      fn.id = setTimeout(() => {
+        fn.call(this, args)
+        clearTimeout(fn.id)
+        fn.id = null
+      }, delay)
+    }
+  }
+
   return {
     provide: {
       utils: {
@@ -118,6 +150,8 @@ export default defineNuxtPlugin((_) => {
         VmoveToSrcTgrObj,
         chunk,
         wait,
+        debounce,
+        throttle,
       },
     },
   }
