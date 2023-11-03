@@ -47,7 +47,18 @@ export default defineNuxtConfig({
     "@nuxt/ui",
     "@nuxtjs/tailwindcss",
     "@nuxtjs/color-mode",
+    "nuxt-socket-io",
   ],
+  io: {
+    // Options
+    sockets: [
+      {
+        name: "main",
+        url: process.env.WS_URL,
+        default: true,
+      },
+    ],
+  },
   ui: {
     global: true,
   },

@@ -40,17 +40,70 @@
 </template>
 
 <script setup lang="ts">
+import { getCookieValue } from "~/helpers/cookies"
+
 const state = reactive({ isTablet: false, isSP: false, isSSP: false })
 const nuxtApp = useNuxtApp()
 const { $store } = useNuxtApp()
 nuxtApp.provide("appState", (name) => state)
 // Function to handle viewport resize
+
+const socket = nuxtApp.$nuxtSocket({
+  transports: ["websocket"],
+  withCredentials: true,
+  extraHeaders: {},
+  auth: {
+    token: getCookieValue("apollo:graphql.token") || "",
+  },
+})
+
+socket.on(`analyze`, (message) => {
+  console.log(message)
+})
+
+socket.on("connect", () => {
+  console.log("socket connect")
+})
+
+socket.on("reconnect", () => {
+  console.log("socket reconnect")
+})
+
+socket.on("disconnect", () => {
+  console.log("socket disconnect")
+})
+
 function handleViewportResize() {
   var viewportWidth = window.innerWidth
   state.isTablet = !(viewportWidth > 999)
   state.isSP = !(viewportWidth > 767)
   state.isSSP = !(viewportWidth > 619)
 }
+
+const handleSendAnalyze = () => {
+  socket.emit(
+    "analyze",
+    {
+      depth: 35,
+      FEN: "rnbakabr1/9/1c4nc1/p3p1p1p/2p6/6P2/P1P1P3P/1C2C1N2/9/RNBAKAB1R w",
+    },
+    (data) => {
+      console.log(data)
+    }
+  )
+}
+
+// setTimeout(() => {
+//   handleSendAnalyze()
+// }, 3000)
+
+// setTimeout(() => {
+//   socket.disconnect()
+// }, 3000)
+
+// setTimeout(() => {
+//   socket.connect()
+// }, 6000)
 
 onMounted(() => {
   // Call the function initially to handle the current viewport size
