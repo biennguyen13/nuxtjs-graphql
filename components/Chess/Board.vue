@@ -12,7 +12,7 @@
         ">"
       }}</UButton>
     </div>
-    <div class="flex flex-wrap">
+    <div class="flex">
       <div class="flex justify-center items-center flex-shrink-0">
         <div id="board" style="width: 400px; height: 400px"></div>
       </div>
