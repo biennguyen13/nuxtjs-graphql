@@ -1,5 +1,5 @@
 <template>
-  <div class="engine h-full">
+  <div class="engine h-full relative">
     <template v-if="!isOutofPooling">
       <div class="engine__move-item flex justify-center p-2">
         <svg
@@ -55,10 +55,12 @@
         </UButton>
 
         <div class="font-bold text-red-600 mt-8 w-full">
-          Out of engine process.
+          {{ outofPoolingText }}
         </div>
       </div>
     </div>
+
+    <div class="absolute inset-0" v-if="state.loading"></div>
   </div>
 </template>
 
@@ -68,7 +70,7 @@ const $chessBoard = nuxtApp.$chessBoard()
 
 const { getToken } = useApollo()
 
-const state = reactive({ analysis: [] })
+const state = reactive({ analysis: [], loading: false })
 
 const socket = nuxtApp.$nuxtSocket({
   transports: ["websocket"],
@@ -174,6 +176,21 @@ const movesFilteredComputed = computed(() => {
 
 const isOutofPooling = computed(() => {
   return state.analysis.some(({ type }) => type === "BUSY")
+})
+watch(
+  () => isOutofPooling.value,
+  async (_) => {
+    if (_) {
+      state.loading = true
+      setTimeout(() => {
+        state.loading = false
+      }, 3000)
+    }
+  }
+)
+
+const outofPoolingText = computed(() => {
+  return state.analysis.find(({ type }) => type === "BUSY")?.msg
 })
 
 onUnmounted(() => {
