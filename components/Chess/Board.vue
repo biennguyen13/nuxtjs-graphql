@@ -35,7 +35,7 @@ import { getCurrentInstance } from "vue"
 import XiangQi from "~/chess/app"
 type XiangQiType = typeof XiangQi
 
-const _this = getCurrentInstance()
+const this_ = getCurrentInstance()
 const nuxtApp = useNuxtApp()
 
 const childrends: { movesComp: any | null } = { movesComp: null }
@@ -68,7 +68,7 @@ const callbackHandler = {
     const mvList = state.xiangqiBoard.board.pos.mvList
 
     const currentSltedMove =
-      state.childrends.movesComp?.setupState?.getCurrentSelectedMove()
+      state.childrends.movesComp?.setupState?.getCurrentSelectedMove?.()
 
     if (currentSltedMove) {
       state.FENList = state.FENList.slice(0, currentSltedMove.index + 1)
