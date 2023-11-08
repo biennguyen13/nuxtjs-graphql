@@ -101,15 +101,8 @@ export default defineNuxtPlugin((_) => {
       array.splice(0, size)
     )
   }
-  const wait = async function (ms = 1000) {
-    return new Promise((res) => {
-      setTimeout(() => {
-        res(ms)
-      }, ms)
-    })
-  }
 
-  const debounce = function (fn, wait = 0) {
+  const debounce = function (fn, delay = 0) {
     let timer
     return function (...args) {
       if (timer) {
@@ -124,7 +117,7 @@ export default defineNuxtPlugin((_) => {
           } catch (e) {
             rej(e)
           }
-        }, wait)
+        }, delay)
       })
     }
   }
@@ -149,7 +142,6 @@ export default defineNuxtPlugin((_) => {
         convertChessdbMoves,
         VmoveToSrcTgrObj,
         chunk,
-        wait,
         debounce,
         throttle,
       },

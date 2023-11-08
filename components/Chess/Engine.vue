@@ -64,6 +64,8 @@
 </template>
 
 <script setup>
+import { wait } from "~/helpers/utils"
+
 const nuxtApp = useNuxtApp()
 const $chessBoard = nuxtApp.$chessBoard()
 
@@ -181,9 +183,8 @@ watch(
   async (_) => {
     if (_) {
       state.delay = true
-      setTimeout(() => {
-        state.delay = false
-      }, 3000)
+      await wait(3000)
+      state.delay = false
     }
   }
 )

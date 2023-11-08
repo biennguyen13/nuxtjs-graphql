@@ -1,5 +1,5 @@
 <template>
-  <div>
+  <div class="h-full">
     <table>
       <thead class="sticky top-0 left-0 bg-white">
         <tr>
@@ -22,17 +22,22 @@
         </tr>
       </tbody>
     </table>
-    <div class="text-center mt-4">
-      <UButton
-        v-if="!movesFilteredComputed.length"
-        :disabled="state.delay"
-        color="primary"
-        size="xl"
-        variant="solid"
-        @click="!state.delay && handleGetCloud($chessBoard.currentFEN)"
-      >
-        Reload
-      </UButton>
+    <div
+      v-if="!movesFilteredComputed.length && !state.loading"
+      class="text-center mt-4 items-center flex justify-center flex-wrap h-full"
+    >
+      <div>
+        <UButton
+          :disabled="state.delay"
+          color="primary"
+          size="xl"
+          variant="solid"
+          @click="!state.delay && handleGetCloud($chessBoard.currentFEN)"
+        >
+          Reload
+        </UButton>
+        <div class="font-bold text-red-600 mt-8 w-full">No data</div>
+      </div>
     </div>
   </div>
 </template>
@@ -42,6 +47,7 @@ import getXapiCdbTokenQuery from "~/graphql/queries/getXapiCdbToken.graphql"
 import addChessdbMutation from "~/graphql/mutations/addChessdb.graphql"
 
 import { addCookieValue } from "~/helpers/cookies"
+import { wait } from "~/helpers/utils"
 
 const nuxtApp = useNuxtApp()
 const $chessBoard = nuxtApp.$chessBoard()
@@ -59,7 +65,7 @@ watch(
       state.loading = true
 
       try {
-        handleGetCloud(FEN)
+        await handleGetCloud(FEN)
       } catch (e) {}
 
       state.loading = false
@@ -81,16 +87,13 @@ const movesFilteredComputed = computed(() => {
   )
 })
 watch(
-  () => movesComputed.value,
+  () => state.moves,
   async (_) => {
-    nextTick(() => {
-      if (!movesFilteredComputed.value.length) {
-        state.delay = true
-        setTimeout(() => {
-          state.delay = false
-        }, 3000)
-      }
-    })
+    if (_ && !movesFilteredComputed.value.length) {
+      state.delay = true
+      await wait(5000)
+      state.delay = false
+    }
   },
   { deep: true }
 )
