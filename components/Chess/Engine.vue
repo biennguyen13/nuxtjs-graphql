@@ -46,10 +46,11 @@
     >
       <div>
         <UButton
+          :disabled="state.delay"
           color="primary"
           size="xl"
           variant="solid"
-          @click="handleSendAnalyze($chessBoard.currentFEN)"
+          @click="!state.delay && handleSendAnalyze($chessBoard.currentFEN)"
         >
           Reload
         </UButton>
@@ -59,8 +60,6 @@
         </div>
       </div>
     </div>
-
-    <div class="absolute inset-0" v-if="state.loading"></div>
   </div>
 </template>
 
@@ -70,7 +69,7 @@ const $chessBoard = nuxtApp.$chessBoard()
 
 const { getToken } = useApollo()
 
-const state = reactive({ analysis: [], loading: false })
+const state = reactive({ analysis: [], delay: false })
 
 const socket = nuxtApp.$nuxtSocket({
   transports: ["websocket"],
@@ -181,9 +180,9 @@ watch(
   () => isOutofPooling.value,
   async (_) => {
     if (_) {
-      state.loading = true
+      state.delay = true
       setTimeout(() => {
-        state.loading = false
+        state.delay = false
       }, 3000)
     }
   }

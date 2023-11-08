@@ -11,7 +11,7 @@
       </thead>
       <tbody class="bg-white">
         <tr
-          v-for="{ move, score, winrate, note } in movesComputed"
+          v-for="{ move, score, winrate, note } in movesFilteredComputed"
           :key="move"
           @click="handleClick(move)"
         >
@@ -24,11 +24,12 @@
     </table>
     <div class="text-center mt-4">
       <UButton
-        v-if="!state.moves"
+        v-if="!movesFilteredComputed.length"
+        :disabled="state.delay"
         color="primary"
         size="xl"
         variant="solid"
-        @click="handleGetCloud($chessBoard.currentFEN)"
+        @click="!state.delay && handleGetCloud($chessBoard.currentFEN)"
       >
         Reload
       </UButton>
@@ -48,6 +49,7 @@ const $chessBoard = nuxtApp.$chessBoard()
 const state = reactive({
   moves: "",
   loading: false,
+  delay: false,
 })
 
 watch(
@@ -71,6 +73,27 @@ watch(
 const movesComputed = computed(() => {
   return nuxtApp.$utils.convertChessdbMoves(state.moves)
 })
+const movesFilteredComputed = computed(() => {
+  return (
+    movesComputed.value?.filter?.(({ score }) => {
+      return !isNaN(parseInt(score))
+    }) ?? []
+  )
+})
+watch(
+  () => movesComputed.value,
+  async (_) => {
+    nextTick(() => {
+      if (!movesFilteredComputed.value.length) {
+        state.delay = true
+        setTimeout(() => {
+          state.delay = false
+        }, 3000)
+      }
+    })
+  },
+  { deep: true }
+)
 
 const handleClick = (move) => {
   if (state.loading) return
@@ -81,6 +104,7 @@ const handleClick = (move) => {
 
 const handleGetCloud = async (FEN) => {
   try {
+    state.moves = ""
     const { data } = await nuxtApp.$chessdbApi.queryall(FEN)
     if (data.includes("move:")) {
       state.moves = data
@@ -88,15 +112,6 @@ const handleGetCloud = async (FEN) => {
       !(await handleaddChessdb()) &&
         (await handleGetXapiCdbToken()) &&
         (await handleaddChessdb())
-    } else {
-      state.moves = ""
-      // await new Promise(async (res) => {
-      //   setTimeout(() => {
-      //     handleGetCloud(FEN).then((_) => {
-      //       res(true)
-      //     })
-      //   }, 1000)
-      // })
     }
   } catch (e) {
     console.log("Error: " + e)
