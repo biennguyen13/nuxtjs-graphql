@@ -40,7 +40,7 @@
 </template>
 
 <script setup lang="ts">
-const state = reactive({ isTablet: false, isSP: false, isSSP: false })
+const state = reactive({ isTablet: false, isSP: false, isSSP: false, vw: 0 })
 const nuxtApp = useNuxtApp()
 const { $store } = useNuxtApp()
 nuxtApp.provide("appState", (name) => state)
@@ -51,6 +51,7 @@ function handleViewportResize() {
   state.isTablet = !(viewportWidth > 999)
   state.isSP = !(viewportWidth > 767)
   state.isSSP = !(viewportWidth > 619)
+  state.vw = viewportWidth
 }
 
 onMounted(() => {
