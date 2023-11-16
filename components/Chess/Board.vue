@@ -14,7 +14,20 @@
     </div>
     <div class="flex">
       <div class="flex justify-center items-center flex-shrink-0">
-        <div id="board" style="width: 400px; height: 400px"></div>
+        <div id="board" style="width: 400px; height: 400px">
+          <div
+            v-for="(sq, index) in state.drawingSquares"
+            :key="index"
+            :style="{
+              top: `${sq.y - sq.height * 0.5}px`,
+              left: `${sq.x - sq.width * 0.5}px`,
+              height: sq.height + 'px',
+              width: sq.width + 'px',
+            }"
+            class="absolute bg-[#ec8989a6] rounded-full border-[2px] border-solid border-black cursor-pointer z-10"
+            @click="sq.onClick"
+          />
+        </div>
       </div>
       <div class="bg-slate-100 flex-grow min-w-[500px]">
         <ChessControlPanel />
@@ -27,19 +40,6 @@
       <audio preload="auto" src="/chess/assets/check.wav" id="sndCheck" />
       <audio preload="auto" src="/chess/assets/move.wav" id="sndMove" />
     </div>
-
-    <div
-      v-for="(sq, index) in state.drawingSquares"
-      :key="index"
-      :style="{
-        top: `${sq.y - sq.height * 0.5}px`,
-        left: `${sq.x - sq.width * 0.5}px`,
-        height: sq.height + 'px',
-        width: sq.width + 'px',
-      }"
-      class="fixed bg-[#ec8989a6] rounded-full border-[2px] border-solid border-black cursor-pointer"
-      @click="sq.onClick"
-    />
   </div>
 </template>
 
@@ -47,6 +47,7 @@
 import { getCurrentInstance } from "vue"
 
 import XiangQi from "~/chess/app"
+import { wait } from "~/helpers/utils"
 type XiangQiType = typeof XiangQi
 
 const this_ = getCurrentInstance()
@@ -96,6 +97,9 @@ const callbackHandler = {
     state.FENList.push(FEN)
   },
   choosePeice(square: number) {
+    const board = document.querySelector("#board") as HTMLDivElement
+    const { x: boardX, y: boardY } = board.getBoundingClientRect()
+
     state.currentSquareClicked = square
     // state.drawingSquares = []
     state.drawingSquares = state.squares
@@ -115,8 +119,8 @@ const callbackHandler = {
 
         const { x, y } = ele.getBoundingClientRect()
         return {
-          x: x + ele.height / 2,
-          y: y + ele.height / 2,
+          x: x + ele.height / 2 - boardX,
+          y: y + ele.height / 2 - boardY,
           width: ele.width * 0.35,
           height: ele.height * 0.35,
           onClick: function () {
@@ -166,8 +170,9 @@ const handleNext = nuxtApp.$utils.throttle(async () => {
 
 watch(
   () => $appState.vw + $appState.vh + $appState.top,
-  () => {
+  async () => {
     if (state.currentSquareClicked) {
+      await wait(1)
       callbackHandler.choosePeice(state.currentSquareClicked)
     }
   }

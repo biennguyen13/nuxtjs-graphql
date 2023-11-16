@@ -1689,7 +1689,7 @@ const RESULT_DRAW = 2
 const RESULT_LOSS = 3
 
 const ANIM_STEP = 8
-const MAX_STEPS = 16
+const MAX_STEPS = 12
 
 const PIECE_NAME = [
   "oo",
