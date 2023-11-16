@@ -1,10 +1,8 @@
 <template>
-  <Teleport v-if="valid" to="body">
-    <div :style="styles" class="fixed">
-      <div :style="styles2" class="absolute top-0 left-0"></div>
-      <div :style="styles3" class="absolute top-0 left-0"></div>
-    </div>
-  </Teleport>
+  <div v-if="valid" :style="styles" class="fixed">
+    <div :style="styles2" class="absolute top-0 left-0"></div>
+    <div :style="styles3" class="absolute top-0 left-0"></div>
+  </div>
 </template>
 
 <script setup lang="ts">

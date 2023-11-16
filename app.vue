@@ -40,18 +40,31 @@
 </template>
 
 <script setup lang="ts">
-const state = reactive({ isTablet: false, isSP: false, isSSP: false, vw: 0 })
+const state = reactive({
+  isTablet: false,
+  isSP: false,
+  isSSP: false,
+  vw: 0,
+  vh: 0,
+  top: 0,
+})
 const nuxtApp = useNuxtApp()
 const { $store } = useNuxtApp()
 nuxtApp.provide("appState", (name) => state)
 // Function to handle viewport resize
 
 function handleViewportResize() {
+  console.log("%capp.vue line:57 11", "color: #007acc;", 11)
   var viewportWidth = window.innerWidth
   state.isTablet = !(viewportWidth > 999)
   state.isSP = !(viewportWidth > 767)
   state.isSSP = !(viewportWidth > 619)
   state.vw = viewportWidth
+  state.vh = window.innerHeight
+}
+
+function handleViewportScroll() {
+  state.top = window.pageYOffset || document.documentElement.scrollTop
 }
 
 onMounted(() => {
@@ -59,10 +72,12 @@ onMounted(() => {
   handleViewportResize()
   // Attach the handleViewportResize function to the resize event
   window.addEventListener("resize", handleViewportResize)
+  window.addEventListener("scroll", handleViewportScroll)
 })
 
 onUnmounted(() => {
   window.removeEventListener("resize", handleViewportResize)
+  window.removeEventListener("scroll", handleViewportScroll)
 })
 </script>
 

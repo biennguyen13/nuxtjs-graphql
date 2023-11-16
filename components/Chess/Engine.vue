@@ -1,5 +1,22 @@
 <template>
   <div class="engine h-full relative">
+    <ChessEngineArrow
+      :x="state.bestMoveDrawing.x"
+      :y="state.bestMoveDrawing.y"
+      :height="state.bestMoveDrawing.height"
+      :width="state.bestMoveDrawing.width"
+      :angle="state.bestMoveDrawing.angle"
+      :color="state.bestMoveDrawing.color"
+    />
+    <ChessEngineArrow
+      :x="state.ponderMoveDrawing.x"
+      :y="state.ponderMoveDrawing.y"
+      :height="state.ponderMoveDrawing.height"
+      :width="state.ponderMoveDrawing.width"
+      :angle="state.ponderMoveDrawing.angle"
+      :color="state.ponderMoveDrawing.color"
+    />
+
     <template v-if="!isOutofPooling">
       <div class="engine__move-item flex justify-center p-2">
         <svg
@@ -60,23 +77,6 @@
         </div>
       </div>
     </div>
-
-    <ChessEngineArrow
-      :x="state.bestMoveDrawing.x"
-      :y="state.bestMoveDrawing.y"
-      :height="state.bestMoveDrawing.height"
-      :width="state.bestMoveDrawing.width"
-      :angle="state.bestMoveDrawing.angle"
-      :color="state.bestMoveDrawing.color"
-    />
-    <ChessEngineArrow
-      :x="state.ponderMoveDrawing.x"
-      :y="state.ponderMoveDrawing.y"
-      :height="state.ponderMoveDrawing.height"
-      :width="state.ponderMoveDrawing.width"
-      :angle="state.ponderMoveDrawing.angle"
-      :color="state.ponderMoveDrawing.color"
-    />
   </div>
 </template>
 
@@ -214,6 +214,8 @@ const movesFilteredComputed = computed(() => {
 })
 const bestMoveCoordinates = computed(() => {
   $appState.vw
+  $appState.vh
+  $appState.top
   const move = movesFilteredComputed.value?.[0]
 
   if (!move) return null
@@ -273,6 +275,8 @@ watch(
 
 const ponderMoveCoordinates = computed(() => {
   $appState.vw
+  $appState.vh
+  $appState.top
   const move = movesFilteredComputed.value?.[0]
 
   if (!move) return null

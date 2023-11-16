@@ -15,29 +15,31 @@
     <div class="flex">
       <div class="flex justify-center items-center flex-shrink-0">
         <div id="board" style="width: 400px; height: 400px"></div>
-        <div
-          v-for="(sq, index) in state.drawingSquares"
-          :key="index"
-          :style="{
-            top: `${sq.y - sq.height * 0.5}px`,
-            left: `${sq.x - sq.width * 0.5}px`,
-            height: sq.height + 'px',
-            width: sq.width + 'px',
-          }"
-          class="fixed bg-[#ffffffa6] rounded-full border-[2px] border-solid border-black cursor-pointer"
-          @click="sq.onClick"
-        />
       </div>
       <div class="bg-slate-100 flex-grow min-w-[500px]">
         <ChessControlPanel />
       </div>
     </div>
+
     <div style="display: none">
       <!-- Try to preload sounds -->
       <audio preload="auto" src="/chess/assets/capture.wav" id="sndCapture" />
       <audio preload="auto" src="/chess/assets/check.wav" id="sndCheck" />
       <audio preload="auto" src="/chess/assets/move.wav" id="sndMove" />
     </div>
+
+    <div
+      v-for="(sq, index) in state.drawingSquares"
+      :key="index"
+      :style="{
+        top: `${sq.y - sq.height * 0.5}px`,
+        left: `${sq.x - sq.width * 0.5}px`,
+        height: sq.height + 'px',
+        width: sq.width + 'px',
+      }"
+      class="fixed bg-[#ec8989a6] rounded-full border-[2px] border-solid border-black cursor-pointer"
+      @click="sq.onClick"
+    />
   </div>
 </template>
 
@@ -49,6 +51,7 @@ type XiangQiType = typeof XiangQi
 
 const this_ = getCurrentInstance()
 const nuxtApp = useNuxtApp()
+const $appState = nuxtApp.$appState()
 
 const childrends: { movesComp: any | null } = { movesComp: null }
 const handler = {
@@ -76,6 +79,7 @@ const callbackHandler = {
     console.log("call back firstMove")
   },
   onmove(FEN: string) {
+    state.currentSquareClicked = null
     state.drawingSquares = []
     state.currentFEN = FEN
     const mvList = state.xiangqiBoard.board.pos.mvList
@@ -92,6 +96,7 @@ const callbackHandler = {
     state.FENList.push(FEN)
   },
   choosePeice(square: number) {
+    state.currentSquareClicked = square
     // state.drawingSquares = []
     state.drawingSquares = state.squares
       .map((sq) => {
@@ -132,6 +137,7 @@ const state = reactive<{
   loading: boolean
   squares: number[]
   drawingSquares: any[]
+  currentSquareClicked: number | null
 }>({
   handler,
   childrends,
@@ -142,6 +148,7 @@ const state = reactive<{
   loading: false,
   squares: [],
   drawingSquares: [],
+  currentSquareClicked: null,
 })
 
 try {
@@ -156,6 +163,15 @@ const handlePrevious = nuxtApp.$utils.throttle(async () => {
 const handleNext = nuxtApp.$utils.throttle(async () => {
   state.childrends.movesComp?.setupState?.makeNextMove()
 }, 500)
+
+watch(
+  () => $appState.vw + $appState.vh + $appState.top,
+  () => {
+    if (state.currentSquareClicked) {
+      callbackHandler.choosePeice(state.currentSquareClicked)
+    }
+  }
+)
 
 onMounted(() => {
   state.xiangqiBoard = new XiangQi()
