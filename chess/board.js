@@ -1939,9 +1939,10 @@ export default class Board extends EventTarget {
   }
 
   addMove(mv, computerMove) {
-    // console.log`addMove`
+    // console.log("%cboard.js line:1946 mv", "color: #007acc;", mv)
+    // console.log(`addMove`)
     if (!this.pos.legalMove(mv) || !this.pos.makeMove(mv)) {
-      //console.log('Illegal move');
+      // console.log("Not Illegal move")
       return
     }
     this.busy = true
@@ -2062,7 +2063,7 @@ export default class Board extends EventTarget {
       return
     }
 
-    let vlRep = this.pos.repStatus(3)
+    let vlRep = this.pos.repStatus(30)
     if (vlRep > 0) {
       let msg
       vlRep = this.pos.repValue(vlRep)
@@ -2226,6 +2227,10 @@ export default class Board extends EventTarget {
       }
       this.drawSquare(sq, true)
       this.sqSelected = sq
+
+      this.dispatchEvent(
+        new CustomEvent("choosePeice", { detail: { square: sq } })
+      )
     } else if (this.sqSelected > 0) {
       this.addMove(MOVE(this.sqSelected, sq), false)
     }

@@ -13,6 +13,7 @@ function XiangQi() {
   this.drawCallback = null
   this.firstMoveCallback = null
   this.onmoveCallback = null
+  this.choosePeiceCallback = null
   this.level = 0
   this.current_level_move = 0
   this.startFen = ""
@@ -62,6 +63,9 @@ XiangQi.prototype.init = function (computer = true, skill = 0, cnDBlevel = 0) {
     self.onmoveCallback(self.getFEN())
   }
   this.board.addEventListener("move", onmove)
+  this.board.addEventListener("choosePeice", function (e) {
+    self.choosePeiceCallback(e.detail.square)
+  })
 
   let ongameover = function (evt) {
     let details = evt.detail
@@ -203,13 +207,15 @@ XiangQi.prototype.setCallBack = function (
   loseCallBack,
   drawCallBack,
   firstMoveCallback,
-  onmoveCallback
+  onmoveCallback,
+  choosePeiceCallback
 ) {
   this.winCallback = winCallBack
   this.loseCallback = loseCallBack
   this.drawCallback = drawCallBack
   this.firstMoveCallback = firstMoveCallback
   this.onmoveCallback = onmoveCallback
+  this.choosePeiceCallback = choosePeiceCallback
 }
 
 XiangQi.prototype.setLevel = function (level = 3) {

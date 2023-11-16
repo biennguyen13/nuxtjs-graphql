@@ -15,6 +15,18 @@
     <div class="flex">
       <div class="flex justify-center items-center flex-shrink-0">
         <div id="board" style="width: 400px; height: 400px"></div>
+        <div
+          v-for="(sq, index) in state.drawingSquares"
+          :key="index"
+          :style="{
+            top: `${sq.y - sq.height * 0.5}px`,
+            left: `${sq.x - sq.width * 0.5}px`,
+            height: sq.height + 'px',
+            width: sq.width + 'px',
+          }"
+          class="fixed bg-[#ffffffa6] rounded-full border-[2px] border-solid border-black cursor-pointer"
+          @click="sq.onClick"
+        />
       </div>
       <div class="bg-slate-100 flex-grow min-w-[500px]">
         <ChessControlPanel />
@@ -64,6 +76,7 @@ const callbackHandler = {
     console.log("call back firstMove")
   },
   onmove(FEN: string) {
+    state.drawingSquares = []
     state.currentFEN = FEN
     const mvList = state.xiangqiBoard.board.pos.mvList
 
@@ -78,6 +91,35 @@ const callbackHandler = {
     state.mvList.push(mvList[mvList.length - 1])
     state.FENList.push(FEN)
   },
+  choosePeice(square: number) {
+    // state.drawingSquares = []
+    state.drawingSquares = state.squares
+      .map((sq) => {
+        const target = sq.toString(2).padStart(8, "0")
+        const source = square.toString(2).padStart(8, "0")
+        return {
+          vmove: parseInt(target + source, 2),
+          sq,
+        }
+      })
+      .filter((move) => state.xiangqiBoard.board.pos.legalMove(move.vmove))
+      .map(({ sq }) => {
+        const ele = document.querySelector(
+          `[xisqr="${sq}"]`
+        ) as HTMLImageElement
+
+        const { x, y } = ele.getBoundingClientRect()
+        return {
+          x: x + ele.height / 2,
+          y: y + ele.height / 2,
+          width: ele.width * 0.35,
+          height: ele.height * 0.35,
+          onClick: function () {
+            state.xiangqiBoard.makeMove(square, sq)
+          },
+        }
+      })
+  },
 }
 
 const state = reactive<{
@@ -88,6 +130,8 @@ const state = reactive<{
   mvList: number[]
   FENList: string[]
   loading: boolean
+  squares: number[]
+  drawingSquares: any[]
 }>({
   handler,
   childrends,
@@ -96,6 +140,8 @@ const state = reactive<{
   mvList: [],
   FENList: [],
   loading: false,
+  squares: [],
+  drawingSquares: [],
 })
 
 try {
@@ -116,10 +162,11 @@ onMounted(() => {
 
   state.xiangqiBoard.setCallBack(
     callbackHandler.win,
-    callbackHandler.draw,
     callbackHandler.lose,
+    callbackHandler.draw,
     callbackHandler.firstMove,
-    callbackHandler.onmove
+    callbackHandler.onmove,
+    callbackHandler.choosePeice
   )
 
   state.xiangqiBoard.start(
@@ -132,6 +179,10 @@ onMounted(() => {
     const FEN = state.xiangqiBoard.getFEN()
     state.currentFEN = FEN
     state.FENList.push(FEN)
+
+    state.squares = Array.from(document.querySelectorAll("[xisqr]")).map(
+      (ele) => parseInt(ele.getAttribute("xisqr") || "0")
+    )
   })
 
   // state.xiangqiBoard.makeMove(170, 58)
