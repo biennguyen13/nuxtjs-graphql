@@ -64,6 +64,8 @@ const { $utils }: any = useNuxtApp()
 const childrends: Childrends = { movesComp: null }
 const handler = {
   restartBoard(index: number, move: number) {
+    state.drawingSquares = []
+
     const FEN = state.FENList[index]
     state.xiangqiBoard.restart(FEN)
     state.xiangqiBoard.board.mvLast = move
@@ -71,6 +73,12 @@ const handler = {
   },
   drawSquare(sq: number | string, selected: boolean) {
     state.xiangqiBoard.board.drawSquare(sq, selected)
+  },
+  flipped(square: number) {
+    return state.xiangqiBoard.board.flipped(square)
+  },
+  makeMove(from: number, to: number) {
+    state.xiangqiBoard.makeMove(handler.flipped(from), handler.flipped(to))
   },
 }
 const callbackHandler = {
@@ -115,9 +123,9 @@ const callbackHandler = {
         const source = square.toString(2).padStart(8, "0")
         return {
           vmove: parseInt(target + source, 2),
-          sq: state.xiangqiBoard.board.flipped(sq),
-          from: state.xiangqiBoard.board.flipped(square),
-          to: state.xiangqiBoard.board.flipped(sq),
+          sq: handler.flipped(sq),
+          from: handler.flipped(square),
+          to: handler.flipped(sq),
         }
       })
       .filter((move) => state.xiangqiBoard.board.pos.legalMove(move.vmove))
@@ -135,7 +143,7 @@ const callbackHandler = {
           width: ele.width * 0.35,
           height: ele.height * 0.35,
           onClick: function () {
-            state.xiangqiBoard.makeMove(from, to)
+            handler.makeMove(from, to)
           },
         }
       })
@@ -165,7 +173,7 @@ const state = reactive<{
   squares: [],
   drawingSquares: [],
   currentSquareClicked: null,
-  isRedFirst: 1,
+  isRedFirst: 0,
 })
 
 const isRedFirst = computed(() => {

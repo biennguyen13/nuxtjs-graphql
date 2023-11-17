@@ -70,7 +70,7 @@ onError((e) => {
 const handleClick = ({ vmove }: Move) => {
   if (loading.value) return
   const [src, tgr] = vmove.split("|")[1].split(":")
-  $chessBoard.xiangqiBoard.makeMove(src, tgr)
+  $chessBoard.handler.makeMove(src, tgr)
 }
 </script>
 

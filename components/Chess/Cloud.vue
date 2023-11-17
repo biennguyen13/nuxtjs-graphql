@@ -102,7 +102,7 @@ const handleClick = (move) => {
   if (state.loading) return
 
   const [src, tgr] = move.split("|")[1].split(":")
-  $chessBoard.xiangqiBoard.makeMove(src, tgr)
+  $chessBoard.handler.makeMove(src, tgr)
 }
 
 const handleGetCloud = async (FEN) => {

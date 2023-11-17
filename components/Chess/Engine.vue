@@ -359,7 +359,7 @@ onUnmounted(() => {
 
 const handleClick = (vmove) => {
   const { src, tgr } = nuxtApp.$utils.VmoveToSrcTgrObj(vmove)
-  $chessBoard.xiangqiBoard.makeMove(src, tgr)
+  $chessBoard.handler.makeMove(src, tgr)
 }
 function calculateMidpointAndDistance(x1, y1, x2, y2) {
   // Calculate midpoint
