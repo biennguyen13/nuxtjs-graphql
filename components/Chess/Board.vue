@@ -119,8 +119,8 @@ const callbackHandler = {
 
         const { x, y } = ele.getBoundingClientRect()
         return {
-          x: x + ele.height / 2 - boardX,
-          y: y + ele.height / 2 - boardY,
+          x: x + ele.height / 2 - boardX - 1,
+          y: y + ele.height / 2 - boardY - 1,
           width: ele.width * 0.35,
           height: ele.height * 0.35,
           onClick: function () {
