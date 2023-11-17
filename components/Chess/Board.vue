@@ -45,16 +45,21 @@
 
 <script setup lang="ts">
 import { getCurrentInstance } from "vue"
-
+import Moves from "./Moves.vue"
 import XiangQi from "~/chess/app"
 import { wait } from "~/helpers/utils"
+
 type XiangQiType = typeof XiangQi
+interface Childrends {
+  movesComp: typeof Moves | null
+}
 
 const this_ = getCurrentInstance()
 const nuxtApp = useNuxtApp()
 const $appState = nuxtApp.$appState()
+const { $utils }: any = useNuxtApp()
 
-const childrends: { movesComp: any | null } = { movesComp: null }
+const childrends: Childrends = { movesComp: null }
 const handler = {
   restartBoard(index: number, move: number) {
     const FEN = state.FENList[index]
@@ -133,7 +138,7 @@ const callbackHandler = {
 
 const state = reactive<{
   handler: any
-  childrends: { movesComp: any | null }
+  childrends: Childrends
   xiangqiBoard: XiangQiType | any
   currentFEN: string
   mvList: number[]
@@ -161,12 +166,12 @@ try {
   console.log("Error" + e)
 }
 
-const handlePrevious = nuxtApp.$utils.throttle(async () => {
+const handlePrevious = $utils.throttle(async () => {
   state.childrends.movesComp?.setupState?.makePreviousMove()
-}, 500)
-const handleNext = nuxtApp.$utils.throttle(async () => {
+}, 350)
+const handleNext = $utils.throttle(async () => {
   state.childrends.movesComp?.setupState?.makeNextMove()
-}, 500)
+}, 350)
 
 watch(
   () => $appState.vw + $appState.vh + $appState.top,

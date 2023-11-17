@@ -54,7 +54,6 @@ nuxtApp.provide("appState", (name) => state)
 // Function to handle viewport resize
 
 function handleViewportResize() {
-  console.log("%capp.vue line:57 11", "color: #007acc;", 11)
   var viewportWidth = window.innerWidth
   state.isTablet = !(viewportWidth > 999)
   state.isSP = !(viewportWidth > 767)
