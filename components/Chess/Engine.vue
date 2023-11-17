@@ -218,11 +218,14 @@ const bestMoveCoordinates = computed(() => {
   $appState.top
   const move = movesFilteredComputed.value?.[0]
 
-  if (!move) return null
+  if (!move || isOutofPooling.value) return null
 
   const { bestvmove } = move
 
-  const { src, tgr } = nuxtApp.$utils.VmoveToSrcTgrObj(bestvmove)
+  let { src, tgr } = nuxtApp.$utils.VmoveToSrcTgrObj(bestvmove)
+
+  src = $chessBoard.handler.flipped(src)
+  tgr = $chessBoard.handler.flipped(tgr)
 
   const srcEle = document.querySelector(`[xisqr="${src}"]`)
   const tgrEle = document.querySelector(`[xisqr="${tgr}"]`)
@@ -279,11 +282,14 @@ const ponderMoveCoordinates = computed(() => {
   $appState.top
   const move = movesFilteredComputed.value?.[0]
 
-  if (!move) return null
+  if (!move || isOutofPooling.value) return null
 
   const { pondervmove } = move
 
-  const { src, tgr } = nuxtApp.$utils.VmoveToSrcTgrObj(pondervmove)
+  let { src, tgr } = nuxtApp.$utils.VmoveToSrcTgrObj(pondervmove)
+
+  src = $chessBoard.handler.flipped(src)
+  tgr = $chessBoard.handler.flipped(tgr)
 
   const srcEle = document.querySelector(`[xisqr="${src}"]`)
   const tgrEle = document.querySelector(`[xisqr="${tgr}"]`)

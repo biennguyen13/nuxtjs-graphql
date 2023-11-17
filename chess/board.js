@@ -2212,6 +2212,7 @@ export default class Board extends EventTarget {
   }
 
   clickSquare(sq_) {
+    console.log(sq_)
     // console.log`clickSquare`
     if (this.busy || this.result !== RESULT_UNKNOWN) {
       return

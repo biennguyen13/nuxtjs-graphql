@@ -123,21 +123,23 @@ const callbackHandler = {
         const source = square.toString(2).padStart(8, "0")
         return {
           vmove: parseInt(target + source, 2),
-          sq: handler.flipped(sq),
-          from: handler.flipped(square),
-          to: handler.flipped(sq),
+          from: square,
+          to: sq,
         }
       })
       .filter((move) => state.xiangqiBoard.board.pos.legalMove(move.vmove))
-      .map(({ sq, from, to }) => {
+      .map(({ from, to }) => {
+        const from_ = handler.flipped(from)
+        const to_ = handler.flipped(to)
+
         const ele = document.querySelector(
-          `[xisqr="${sq}"]`
+          `[xisqr="${to_}"]`
         ) as HTMLImageElement
 
         const { x, y } = ele.getBoundingClientRect()
         return {
-          from,
-          to,
+          from: from_,
+          to: to_,
           x: x + ele.height / 2 - boardX - 1,
           y: y + ele.height / 2 - boardY - 1,
           width: ele.width * 0.35,
