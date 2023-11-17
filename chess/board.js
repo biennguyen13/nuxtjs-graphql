@@ -553,6 +553,7 @@ Position.prototype.makeMove = function (mv) {
   let zobristKey = this.zobristKey
   this.movePiece(mv)
   if (this.checked()) {
+    console.log("checked")
     this.undoMovePiece(mv)
     return false
   }

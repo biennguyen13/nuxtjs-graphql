@@ -24,6 +24,8 @@
               height: sq.height + 'px',
               width: sq.width + 'px',
             }"
+            :from="sq.from"
+            :to="sq.to"
             class="absolute bg-[#ec8989a6] rounded-full border-[2px] border-solid border-black cursor-pointer z-10"
             @click="sq.onClick"
           />
@@ -113,23 +115,27 @@ const callbackHandler = {
         const source = square.toString(2).padStart(8, "0")
         return {
           vmove: parseInt(target + source, 2),
-          sq,
+          sq: state.xiangqiBoard.board.flipped(sq),
+          from: state.xiangqiBoard.board.flipped(square),
+          to: state.xiangqiBoard.board.flipped(sq),
         }
       })
       .filter((move) => state.xiangqiBoard.board.pos.legalMove(move.vmove))
-      .map(({ sq }) => {
+      .map(({ sq, from, to }) => {
         const ele = document.querySelector(
           `[xisqr="${sq}"]`
         ) as HTMLImageElement
 
         const { x, y } = ele.getBoundingClientRect()
         return {
+          from,
+          to,
           x: x + ele.height / 2 - boardX - 1,
           y: y + ele.height / 2 - boardY - 1,
           width: ele.width * 0.35,
           height: ele.height * 0.35,
           onClick: function () {
-            state.xiangqiBoard.makeMove(square, sq)
+            state.xiangqiBoard.makeMove(from, to)
           },
         }
       })
@@ -147,6 +153,7 @@ const state = reactive<{
   squares: number[]
   drawingSquares: any[]
   currentSquareClicked: number | null
+  isRedFirst: number
 }>({
   handler,
   childrends,
@@ -158,6 +165,11 @@ const state = reactive<{
   squares: [],
   drawingSquares: [],
   currentSquareClicked: null,
+  isRedFirst: 1,
+})
+
+const isRedFirst = computed(() => {
+  return state.isRedFirst
 })
 
 try {
@@ -196,7 +208,7 @@ onMounted(() => {
   )
 
   state.xiangqiBoard.start(
-    1,
+    isRedFirst.value,
     -1,
     "rnbakabnr/9/1c5c1/p1p1p1p1p/9/9/P1P1P1P1P/1C5C1/9/RNBAKABNR w"
   )
@@ -211,6 +223,9 @@ onMounted(() => {
     )
   })
 
+  // setTimeout(() => {
+  //   state.xiangqiBoard.board.pos.undoMovePiece()
+  // }, 10000)
   // state.xiangqiBoard.makeMove(170, 58)
 })
 </script>

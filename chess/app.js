@@ -187,7 +187,7 @@ XiangQi.prototype.start = function (
   //   this.resize(this.elGame, this.elBoard, this.board)
   //   this.init(true, 2, 0)
   // } else {
-  this.board = new Board(this.elBoard, redFirst, true, fen)
+  this.board = new Board(this.elBoard, redFirst, false, fen)
   this.resize(this.elGame, this.elBoard, this.board)
   this.init(false, 2, cnDBLevel)
   // }
