@@ -2238,6 +2238,10 @@ export default class Board extends EventTarget {
     }
   }
 
+  getSquareName(sq) {
+    return PIECE_NAME[this.pos.squares[sq]]
+  }
+
   drawSquare(sq, selected) {
     let img = this.imgSquares[this.flipped(sq)]
     let name = PIECE_NAME[this.pos.squares[sq]]

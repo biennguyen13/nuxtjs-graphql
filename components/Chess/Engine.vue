@@ -43,10 +43,14 @@
 
       <div
         v-for="(
-          { depth, score, time, nodes, moves, vmove }, index
+          { depth, score, time, nodes, moves, vmove, type }, index
         ) in movesFilteredComputed"
         :key="index"
-        class="engine__move-item cursor-pointer flex flex-wrap max-w-full p-2 bg-white"
+        class="engine__move-item cursor-pointer flex flex-wrap max-w-full p-2"
+        :class="{
+          'bg-red-50': type === 'ANALYZE',
+          'bg-blue-50': type === 'LAZY_ANALYZE',
+        }"
         @click="handleClick(vmove)"
       >
         <div class="flex-1 font-bold text-blue-700">Depth: {{ depth }}</div>
@@ -184,7 +188,7 @@ const movesComputed = computed(() => {
         time: (parseInt(time) / 1000).toFixed(1),
         nodes,
         // msg,
-        // type,
+        type,
         moves: arr[arr.length - 1],
       }
     })

@@ -11,13 +11,19 @@
       </thead>
       <tbody class="bg-white">
         <tr
-          v-for="{ move, score, winrate, note } in movesFilteredComputed"
+          v-for="{
+            move,
+            score,
+            winrate,
+            note,
+            translate,
+          } in movesFilteredComputed"
           :key="move"
           @click="handleClick(move)"
           @mouseenter="handleMouseEnter(move)"
           @mouseleave="handleMouseLeave"
         >
-          <td>{{ move.split("|")[0] }}</td>
+          <td>{{ translate }}</td>
           <td>{{ score }}</td>
           <td>{{ winrate }}</td>
           <td>{{ note }}</td>
@@ -83,9 +89,14 @@ const movesComputed = computed(() => {
 })
 const movesFilteredComputed = computed(() => {
   return (
-    movesComputed.value?.filter?.(({ score }) => {
-      return !isNaN(parseInt(score))
-    }) ?? []
+    movesComputed.value
+      ?.filter?.(({ score }) => {
+        return !isNaN(parseInt(score))
+      })
+      ?.map((item) => ({
+        ...item,
+        translate: $chessBoard.handler.convertMoveToHumanReadable(item.move),
+      })) ?? []
   )
 })
 watch(

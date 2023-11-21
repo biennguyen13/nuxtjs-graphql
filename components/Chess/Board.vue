@@ -13,7 +13,18 @@
       }}</UButton>
     </div>
     <div class="flex">
-      <div class="flex justify-center items-center flex-shrink-0">
+      <div class="flex flex-shrink-0 flex-col">
+        <div class="h-8 w-full text-white flex justify-between relative">
+          <span
+            class="absolute top-0"
+            v-for="n in 9"
+            :key="n"
+            :style="{
+              left: ((n - 0.5) / 9) * 97 + '%',
+            }"
+            >{{ n }}</span
+          >
+        </div>
         <div ref="boardRef" id="board" style="width: 400px; height: 400px">
           <div
             drawingSquares
@@ -33,7 +44,7 @@
 
           <div
             drawingSuggestionMove
-            v-show="state.drawingSuggestionMove.y"
+            v-if="state.drawingSuggestionMove.y"
             :style="{
               top: `${
                 state.drawingSuggestionMove.y -
@@ -50,6 +61,17 @@
             :to="state.drawingSuggestionMove.to"
             class="absolute bg-[#ec8989a6] rounded-full border-[1px] border-solid border-black cursor-pointer z-10"
           />
+        </div>
+        <div class="h-8 w-full text-white flex justify-between relative">
+          <span
+            class="absolute top-0"
+            v-for="n in 9"
+            :key="n"
+            :style="{
+              left: ((n - 0.5) / 9) * 97 + '%',
+            }"
+            >{{ Math.abs(n - 10) }}</span
+          >
         </div>
       </div>
       <div class="bg-slate-100 flex-grow min-w-[500px]">
@@ -80,6 +102,65 @@ type XiangQiType = typeof XiangQi
 interface Childrends {
   movesComp: typeof Moves | null
 }
+
+const PIECE_NAME = Object.freeze({
+  rk: "Tướng đỏ",
+  ra: "Sĩ đỏ",
+  rb: "Tượng đỏ",
+  rn: "Mã đỏ",
+  rr: "Xe đỏ",
+  rc: "Pháo đỏ",
+  rp: "Tốt đỏ",
+  bk: "Tướng đen",
+  ba: "Sĩ đen",
+  bb: "Tượng đen",
+  bn: "Mã đen",
+  br: "Xe đen",
+  bc: "Pháo đen",
+  bp: "Tốt đen",
+})
+
+const SECOND_MATRIX = Object.freeze(
+  [
+    [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+    [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+    [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+    [0, 0, 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 0, 0, 0, 0],
+    [0, 0, 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 0, 0, 0, 0],
+    [0, 0, 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 0, 0, 0, 0],
+    [0, 0, 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 0, 0, 0, 0],
+    [0, 0, 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 0, 0, 0, 0],
+    [0, 0, 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 0, 0, 0, 0],
+    [0, 0, 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 0, 0, 0, 0],
+    [0, 0, 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 0, 0, 0, 0],
+    [0, 0, 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 0, 0, 0, 0],
+    [0, 0, 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 0, 0, 0, 0],
+    [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+    [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+    [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+  ].flat()
+)
+
+const PRIMARY_MATRIX = Object.freeze(
+  [
+    [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+    [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+    [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+    [0, 0, 0, 9, 8, 7, 6, 5, 4, 3, 2, 1, 0, 0, 0, 0],
+    [0, 0, 0, 9, 8, 7, 6, 5, 4, 3, 2, 1, 0, 0, 0, 0],
+    [0, 0, 0, 9, 8, 7, 6, 5, 4, 3, 2, 1, 0, 0, 0, 0],
+    [0, 0, 0, 9, 8, 7, 6, 5, 4, 3, 2, 1, 0, 0, 0, 0],
+    [0, 0, 0, 9, 8, 7, 6, 5, 4, 3, 2, 1, 0, 0, 0, 0],
+    [0, 0, 0, 9, 8, 7, 6, 5, 4, 3, 2, 1, 0, 0, 0, 0],
+    [0, 0, 0, 9, 8, 7, 6, 5, 4, 3, 2, 1, 0, 0, 0, 0],
+    [0, 0, 0, 9, 8, 7, 6, 5, 4, 3, 2, 1, 0, 0, 0, 0],
+    [0, 0, 0, 9, 8, 7, 6, 5, 4, 3, 2, 1, 0, 0, 0, 0],
+    [0, 0, 0, 9, 8, 7, 6, 5, 4, 3, 2, 1, 0, 0, 0, 0],
+    [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+    [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+    [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+  ].flat()
+)
 
 const this_ = getCurrentInstance()
 const nuxtApp = useNuxtApp()
@@ -143,6 +224,49 @@ const handler = {
 
     handler.drawSquare(fromSq, true)
   },
+  getSquareName(square: number) {
+    return state.xiangqiBoard.board.getSquareName(square)
+  },
+  convertMoveToHumanReadable(move: string) {
+    const result: {
+      peice: string
+      srcPos: number
+      action: string
+      tgrPos: number
+    } = {
+      peice: "",
+      srcPos: 0,
+      action: "",
+      tgrPos: 0,
+    }
+    const vmove = $utils.moveToVmove(move)
+    const { src, tgr } = $utils.VmoveToSrcTgrObj(vmove)
+
+    const srcName = handler.getSquareName(src)
+    const tgrName = handler.getSquareName(tgr)
+    const matrix =
+      state.xiangqiBoard.board.pos.sdPlayer === 0
+        ? PRIMARY_MATRIX
+        : SECOND_MATRIX
+
+    const srcRank = parseInt(move[1])
+    const tgrRank = parseInt(move[3])
+
+    result.peice = PIECE_NAME[srcName] as string
+    result.srcPos = matrix[src]
+    result.action = (() => {
+      if (srcRank === tgrRank) return "bình"
+      if (srcRank < tgrRank) {
+        return state.xiangqiBoard.board.pos.sdPlayer === 0 ? "tấn" : "thoái"
+      } else {
+        return state.xiangqiBoard.board.pos.sdPlayer === 0 ? "thoái" : "tấn"
+      }
+    })()
+    result.tgrPos =
+      matrix[tgr] === matrix[src] ? Math.abs(srcRank - tgrRank) : matrix[tgr]
+
+    return Object.values(result).join(" ")
+  },
 }
 const callbackHandler = {
   win() {
@@ -175,41 +299,41 @@ const callbackHandler = {
     state.mvList.push(mvList[mvList.length - 1])
     state.FENList.push(FEN)
   },
-  choosePeice(square: number) {
+  choosePeice(flippedSquare: number) {
     const board = boardRef.value as HTMLDivElement
     const { x: boardX, y: boardY } = board.getBoundingClientRect()
 
-    state.currentSquareClicked = square
+    state.currentSquareClicked = flippedSquare
     // state.drawingSquares = []
     state.drawingSquares = state.squares
       .map((sq) => {
         const target = sq.toString(2).padStart(8, "0")
-        const source = square.toString(2).padStart(8, "0")
+        const source = flippedSquare.toString(2).padStart(8, "0")
         return {
           vmove: parseInt(target + source, 2),
-          from: square,
-          to: sq,
+          flippedFrom: flippedSquare,
+          flippedTo: sq,
         }
       })
       .filter((move) => state.xiangqiBoard.board.pos.legalMove(move.vmove))
-      .map(({ from, to }) => {
-        const from_ = handler.flipped(from)
-        const to_ = handler.flipped(to)
+      .map(({ flippedFrom, flippedTo }) => {
+        const realFrom = handler.flipped(flippedFrom)
+        const realTo = handler.flipped(flippedTo)
 
         const ele = document.querySelector(
-          `[xisqr="${to_}"]`
+          `[xisqr="${realTo}"]`
         ) as HTMLImageElement
 
         const { x, y } = ele.getBoundingClientRect()
         return {
-          from: from_,
-          to: to_,
+          from: realFrom,
+          to: realTo,
           x: x + ele.height / 2 - boardX - 1,
           y: y + ele.height / 2 - boardY - 1,
           width: ele.width * 0.35,
           height: ele.height * 0.35,
           onClick: function () {
-            handler.makeMove(from, to)
+            handler.makeMove(flippedFrom, flippedTo)
           },
         }
       })
@@ -247,7 +371,7 @@ const state = reactive<{
   squares: [],
   drawingSquares: [],
   currentSquareClicked: null,
-  isRedFirst: 0,
+  isRedFirst: 1,
   drawingSuggestionMove: {
     y: 0,
     x: 0,

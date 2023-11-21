@@ -10,13 +10,20 @@
     </thead>
     <tbody class="bg-white">
       <tr
-        v-for="{ id, vmove, vscore, vvalid, vmemo } in state.moves"
+        v-for="{
+          id,
+          vmove,
+          vscore,
+          vvalid,
+          vmemo,
+          translate,
+        } in translatedMoves"
         :key="id"
         @click="handleClick({ id, vmove, vscore, vvalid, vmemo })"
         @mouseenter="handleMouseEnter(vmove)"
         @mouseleave="handleMouseLeave"
       >
-        <td>{{ vmove.split("|")[0] }}</td>
+        <td>{{ translate }}</td>
         <td>{{ vscore }}</td>
         <td>{{ vvalid ? "Yes" : "No" }}</td>
         <td>{{ vmemo }}</td>
@@ -34,6 +41,7 @@ type Move = {
   vscore: number
   vvalid: boolean
   vmemo: string
+  translate: string
 }
 
 const nuxtApp = useNuxtApp()
@@ -70,6 +78,15 @@ onResult(({ data }) => {
 })
 onError((e) => {
   console.log("Error: " + e)
+})
+
+const translatedMoves = computed(() => {
+  return state.moves.map((data: any) => ({
+    ...data,
+    translate: $chessBoard.handler.convertMoveToHumanReadable(
+      data.vmove.split("|")[0]
+    ),
+  }))
 })
 
 const handleClick = ({ vmove }: Move) => {
