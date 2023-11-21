@@ -45,6 +45,6 @@
 
 <script setup lang="ts">
 const state = reactive({
-  component: 3,
+  component: 0,
 })
 </script>

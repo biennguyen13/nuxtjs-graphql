@@ -14,6 +14,8 @@
           v-for="{ move, score, winrate, note } in movesFilteredComputed"
           :key="move"
           @click="handleClick(move)"
+          @mouseenter="handleMouseEnter(move)"
+          @mouseleave="handleMouseLeave"
         >
           <td>{{ move.split("|")[0] }}</td>
           <td>{{ score }}</td>
@@ -154,6 +156,13 @@ const handleGetXapiCdbToken = async () => {
     console.log("Error: " + e)
     return false
   }
+}
+const handleMouseEnter = (move) => {
+  const [src, tgr] = move.split("|")[1].split(":")
+  $chessBoard.handler.setDrawingSuggestionMove(src, tgr)
+}
+const handleMouseLeave = () => {
+  $chessBoard.handler.setDrawingSuggestionMove(null)
 }
 </script>
 

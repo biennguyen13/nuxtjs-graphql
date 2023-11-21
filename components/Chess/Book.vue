@@ -13,6 +13,8 @@
         v-for="{ id, vmove, vscore, vvalid, vmemo } in state.moves"
         :key="id"
         @click="handleClick({ id, vmove, vscore, vvalid, vmemo })"
+        @mouseenter="handleMouseEnter(vmove)"
+        @mouseleave="handleMouseLeave"
       >
         <td>{{ vmove.split("|")[0] }}</td>
         <td>{{ vscore }}</td>
@@ -49,6 +51,9 @@ const { refetch, load, onResult, onError, loading } = useLazyQuery(
     FEN:
       $chessBoard.currentFEN ||
       "rnbakabnr/9/1c5c1/p1p1p1p1p/9/9/P1P1P1P1P/1C5C1/9/RNBAKABNR w",
+  },
+  {
+    fetchPolicy: "cache-first",
   }
 )
 watch(
@@ -71,6 +76,13 @@ const handleClick = ({ vmove }: Move) => {
   if (loading.value) return
   const [src, tgr] = vmove.split("|")[1].split(":")
   $chessBoard.handler.makeMove(src, tgr)
+}
+const handleMouseEnter = (vmove: string) => {
+  const [src, tgr] = vmove.split("|")[1].split(":")
+  $chessBoard.handler.setDrawingSuggestionMove(src, tgr)
+}
+const handleMouseLeave = () => {
+  $chessBoard.handler.setDrawingSuggestionMove(null)
 }
 </script>
 

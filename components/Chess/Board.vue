@@ -14,8 +14,9 @@
     </div>
     <div class="flex">
       <div class="flex justify-center items-center flex-shrink-0">
-        <div id="board" style="width: 400px; height: 400px">
+        <div ref="boardRef" id="board" style="width: 400px; height: 400px">
           <div
+            drawingSquares
             v-for="(sq, index) in state.drawingSquares"
             :key="index"
             :style="{
@@ -26,8 +27,28 @@
             }"
             :from="sq.from"
             :to="sq.to"
-            class="absolute bg-[#ec8989a6] rounded-full border-[2px] border-solid border-black cursor-pointer z-10"
+            class="absolute bg-[#ec8989a6] rounded-full border-[1px] border-solid border-black cursor-pointer z-10"
             @click="sq.onClick"
+          />
+
+          <div
+            drawingSuggestionMove
+            v-show="state.drawingSuggestionMove.y"
+            :style="{
+              top: `${
+                state.drawingSuggestionMove.y -
+                state.drawingSuggestionMove.height * 0.5
+              }px`,
+              left: `${
+                state.drawingSuggestionMove.x -
+                state.drawingSuggestionMove.width * 0.5
+              }px`,
+              height: state.drawingSuggestionMove.height + 'px',
+              width: state.drawingSuggestionMove.width + 'px',
+            }"
+            :from="state.drawingSuggestionMove.from"
+            :to="state.drawingSuggestionMove.to"
+            class="absolute bg-[#ec8989a6] rounded-full border-[1px] border-solid border-black cursor-pointer z-10"
           />
         </div>
       </div>
@@ -51,6 +72,10 @@ import Moves from "./Moves.vue"
 import XiangQi from "~/chess/app"
 import { wait } from "~/helpers/utils"
 
+function MOVE(sqSrc: number, sqDst: number) {
+  return sqSrc + (sqDst << 8)
+}
+
 type XiangQiType = typeof XiangQi
 interface Childrends {
   movesComp: typeof Moves | null
@@ -60,6 +85,7 @@ const this_ = getCurrentInstance()
 const nuxtApp = useNuxtApp()
 const $appState = nuxtApp.$appState()
 const { $utils }: any = useNuxtApp()
+const boardRef = ref<HTMLDivElement | null>(null)
 
 const childrends: Childrends = { movesComp: null }
 const handler = {
@@ -77,8 +103,45 @@ const handler = {
   flipped(square: number) {
     return state.xiangqiBoard.board.flipped(square)
   },
-  makeMove(from: number, to: number) {
-    state.xiangqiBoard.makeMove(handler.flipped(from), handler.flipped(to))
+  makeMove(from: string | number, to: string | number) {
+    from = parseInt(from as string)
+    to = parseInt(to as string)
+    state.xiangqiBoard.board.addMove(MOVE(from, to), false)
+    // state.xiangqiBoard.makeMove(handler.flipped(from), handler.flipped(to))
+  },
+  setDrawingSuggestionMove(
+    fromSq: string | number | null,
+    toSq: string | number | null
+  ) {
+    if (state.xiangqiBoard.board.sqSelected) {
+      handler.drawSquare(state.xiangqiBoard.board.sqSelected, false)
+      state.xiangqiBoard.board.sqSelected = 0
+      state.drawingSquares = []
+    }
+
+    if (!fromSq || !toSq) {
+      handler.drawSquare(
+        handler.flipped(state.drawingSuggestionMove.from as number),
+        false
+      )
+      return clearDrawingSuggestionMove()
+    }
+    const board = boardRef.value as HTMLDivElement
+    const { x: boardX, y: boardY } = board.getBoundingClientRect()
+
+    const from = handler.flipped(fromSq as number)
+    const to = handler.flipped(toSq as number)
+    const ele = document.querySelector(`[xisqr="${to}"]`) as HTMLImageElement
+    const { x, y } = ele.getBoundingClientRect()
+
+    state.drawingSuggestionMove.x = x + ele.height / 2 - boardX - 1
+    state.drawingSuggestionMove.y = y + ele.height / 2 - boardY - 1
+    state.drawingSuggestionMove.height = ele.width * 0.35
+    state.drawingSuggestionMove.width = ele.width * 0.35
+    state.drawingSuggestionMove.from = from
+    state.drawingSuggestionMove.to = to
+
+    handler.drawSquare(fromSq, true)
   },
 }
 const callbackHandler = {
@@ -95,6 +158,7 @@ const callbackHandler = {
     console.log("call back firstMove")
   },
   onmove(FEN: string) {
+    clearDrawingSuggestionMove()
     state.currentSquareClicked = null
     state.drawingSquares = []
     state.currentFEN = FEN
@@ -112,7 +176,7 @@ const callbackHandler = {
     state.FENList.push(FEN)
   },
   choosePeice(square: number) {
-    const board = document.querySelector("#board") as HTMLDivElement
+    const board = boardRef.value as HTMLDivElement
     const { x: boardX, y: boardY } = board.getBoundingClientRect()
 
     state.currentSquareClicked = square
@@ -164,6 +228,14 @@ const state = reactive<{
   drawingSquares: any[]
   currentSquareClicked: number | null
   isRedFirst: number
+  drawingSuggestionMove: {
+    y: number
+    x: number
+    height: number
+    width: number
+    from: string | number
+    to: string | number
+  }
 }>({
   handler,
   childrends,
@@ -176,6 +248,14 @@ const state = reactive<{
   drawingSquares: [],
   currentSquareClicked: null,
   isRedFirst: 0,
+  drawingSuggestionMove: {
+    y: 0,
+    x: 0,
+    height: 0,
+    width: 0,
+    from: 0,
+    to: 0,
+  },
 })
 
 const isRedFirst = computed(() => {
@@ -204,6 +284,15 @@ watch(
     }
   }
 )
+
+const clearDrawingSuggestionMove = () => {
+  state.drawingSuggestionMove.x = 0
+  state.drawingSuggestionMove.y = 0
+  state.drawingSuggestionMove.height = 0
+  state.drawingSuggestionMove.width = 0
+  state.drawingSuggestionMove.from = 0
+  state.drawingSuggestionMove.to = 0
+}
 
 onMounted(() => {
   state.xiangqiBoard = new XiangQi()
