@@ -70,7 +70,7 @@ export default {
       return $chessBoard.translatedList || []
     })
     watch(
-      () => vmovesList.value.length,
+      () => vmovesList.value,
       () => {
         state.srctgrMovesComputed = [
           {
@@ -91,6 +91,9 @@ export default {
             select: false,
           })),
         ]
+      },
+      {
+        deep: true,
       }
     )
 
