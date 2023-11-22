@@ -378,11 +378,8 @@ const callbackHandler = {
       tgr: number
     }
 
-    const realSrc = handler.flipped(_src)
-    const realTgr = handler.flipped(_tgr)
-
-    const realMove = nuxtApp.$utils.VmoveToMove((realSrc << 8) + realTgr)
-    const translate = handler.convertMoveToHumanReadable(realMove)
+    const move = nuxtApp.$utils.VmoveToMove((_src << 8) + _tgr)
+    const translate = handler.convertMoveToHumanReadable2(move)
 
     const currentSltedMove =
       state.childrends.movesComp?.setupState?.getCurrentSelectedMove?.()

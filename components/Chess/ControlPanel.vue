@@ -1,6 +1,6 @@
 <template>
   <div class="flex flex-col justify-end h-full">
-    <div class="flex-grow overflow-y-auto max-h-[553px]">
+    <div class="flex-grow overflow-y-auto max-h-[617px]">
       <ChessBook v-show="state.component === 0" />
       <ChessEngine v-show="state.component === 1" />
       <ChessCloud v-show="state.component === 2" />
