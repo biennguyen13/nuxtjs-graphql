@@ -19,7 +19,7 @@
           }"
         >
           <td>{{ index }}</td>
-          <td>{{ redMove.move }}</td>
+          <td>{{ redMove.translated }}</td>
         </tr>
         <tr
           v-if="blkMove"
@@ -30,7 +30,7 @@
           }"
         >
           <td></td>
-          <td>{{ blkMove?.move }}</td>
+          <td>{{ blkMove?.translated }}</td>
         </tr>
       </template>
     </tbody>
@@ -41,6 +41,11 @@
 import { getCurrentInstance } from "vue"
 
 type Props = {}
+type StateType = {
+  movesList?: any[]
+  translatedMovesList?: string[]
+  srctgrMovesComputed: any[]
+}
 
 export default {
   props: {},
@@ -50,33 +55,47 @@ export default {
     const nuxtApp = useNuxtApp()
     const $chessBoard = nuxtApp.$chessBoard()
 
+    const state = reactive<StateType>({
+      // movesList: [],
+      // translatedMovesList: [],
+      srctgrMovesComputed: [],
+    })
     const movesList = computed(() => {
-      return $chessBoard?.xiangqiBoard?.getMoveList?.($chessBoard?.mvList) || []
+      return $chessBoard.xiangqiBoard.getMoveList($chessBoard.mvList) || []
     })
     const vmovesList = computed(() => {
-      return $chessBoard?.mvList || []
+      return $chessBoard.mvList || []
     })
-    const srctgrMovesComputed = computed(() => {
-      return [
-        {
-          srctgr: 0,
-          move: 0,
-          vmove: 0,
-          index: 0,
-          select: false,
-        },
-        null,
-        ...vmovesList.value.map((val: number, index: number) => ({
-          srctgr: nuxtApp.$utils.VmoveToSrcTgrObj(val),
-          move: movesList.value[index],
-          vmove: vmovesList.value[index],
-          index: index + 1,
-          select: false,
-        })),
-      ]
+    const translatedList = computed(() => {
+      return $chessBoard.translatedList || []
     })
+    watch(
+      () => vmovesList.value.length,
+      () => {
+        state.srctgrMovesComputed = [
+          {
+            srctgr: 0,
+            move: 0,
+            translated: "",
+            vmove: 0,
+            index: 0,
+            select: false,
+          },
+          null,
+          ...vmovesList.value.map((val: number, index: number) => ({
+            srctgr: nuxtApp.$utils.VmoveToSrcTgrObj(val),
+            move: movesList.value[index],
+            translated: translatedList.value[index],
+            vmove: val,
+            index: index + 1,
+            select: false,
+          })),
+        ]
+      }
+    )
+
     const movesChunkComputed = computed(() => {
-      return nuxtApp.$utils.chunk(srctgrMovesComputed.value, 2)
+      return nuxtApp.$utils.chunk(state.srctgrMovesComputed, 2)
     })
     const movesChunkFlatComputed = computed(() => {
       return movesChunkComputed.value.flat().filter((item) => !!item)
@@ -97,7 +116,7 @@ export default {
         $chessBoard.handler.drawSquare(src, true)
         $chessBoard.handler.drawSquare(tgr, true)
       }
-      this_?.proxy?.$forceUpdate()
+      // this_?.proxy?.$forceUpdate()
     }
 
     const getCurrentSelectedMove = () => {
@@ -134,7 +153,13 @@ export default {
 
     return {
       this_,
+      nuxtApp,
+      $chessBoard,
+      movesList,
+      vmovesList,
+      state,
       movesChunkComputed,
+      movesChunkFlatComputed,
       handleClick,
       getCurrentSelectedMove,
       makeNextMove,

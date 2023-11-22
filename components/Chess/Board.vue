@@ -99,6 +99,39 @@ function MOVE(sqSrc: number, sqDst: number) {
 }
 
 type XiangQiType = typeof XiangQi
+type StateType = {
+  handler: {
+    restartBoard(index: number, move: number): void
+    drawSquare(sq: number | string, selected: boolean): void
+    flipped(square: number): number
+    makeMove(from: string | number, to: string | number): void
+    setDrawingSuggestionMove(
+      fromSq: string | number | null,
+      toSq: string | number | null
+    ): void
+    getSquareName(square: number): any
+    convertMoveToHumanReadable(move: string, reverseSide?: boolean): string
+  }
+  childrends: Childrends
+  xiangqiBoard: XiangQiType | any
+  currentFEN: string
+  mvList: number[]
+  translatedList: string[]
+  FENList: string[]
+  loading: boolean
+  squares: number[]
+  drawingSquares: any[]
+  currentSquareClicked: number | null
+  isRedFirst: number
+  drawingSuggestionMove: {
+    y: number
+    x: number
+    height: number
+    width: number
+    from: string | number
+    to: string | number
+  }
+}
 interface Childrends {
   movesComp: typeof Moves | null
 }
@@ -181,7 +214,7 @@ const handler = {
   drawSquare(sq: number | string, selected: boolean) {
     state.xiangqiBoard.board.drawSquare(sq, selected)
   },
-  flipped(square: number) {
+  flipped(square: number): number {
     return state.xiangqiBoard.board.flipped(square)
   },
   makeMove(from: string | number, to: string | number) {
@@ -338,40 +371,48 @@ const callbackHandler = {
         }
       })
   },
+  beforeMove({ detail: { mv } }: { detail: { mv: number } }) {
+    // thuật toán move của board ngược lại với book, nên cần đảo src <-> tgr
+    const { src: _tgr, tgr: _src } = nuxtApp.$utils.VmoveToSrcTgrObj(mv) as {
+      src: number
+      tgr: number
+    }
+
+    const realSrc = handler.flipped(_src)
+    const realTgr = handler.flipped(_tgr)
+
+    const realMove = nuxtApp.$utils.VmoveToMove((realSrc << 8) + realTgr)
+    const translate = handler.convertMoveToHumanReadable(realMove)
+
+    const currentSltedMove =
+      state.childrends.movesComp?.setupState?.getCurrentSelectedMove?.()
+    if (currentSltedMove) {
+      state.translatedList = state.translatedList.slice(
+        0,
+        currentSltedMove.index
+      )
+    }
+
+    state.translatedList.push(translate)
+  },
+  cancelMove({ detail: { mv } }: { detail: { mv: number } }) {
+    state.translatedList.pop()
+  },
 }
 
-const state = reactive<{
-  handler: any
-  childrends: Childrends
-  xiangqiBoard: XiangQiType | any
-  currentFEN: string
-  mvList: number[]
-  FENList: string[]
-  loading: boolean
-  squares: number[]
-  drawingSquares: any[]
-  currentSquareClicked: number | null
-  isRedFirst: number
-  drawingSuggestionMove: {
-    y: number
-    x: number
-    height: number
-    width: number
-    from: string | number
-    to: string | number
-  }
-}>({
+const state = reactive<StateType>({
   handler,
   childrends,
   xiangqiBoard: null,
   currentFEN: "",
   mvList: [],
+  translatedList: [],
   FENList: [],
   loading: false,
   squares: [],
   drawingSquares: [],
   currentSquareClicked: null,
-  isRedFirst: 0,
+  isRedFirst: 1,
   drawingSuggestionMove: {
     y: 0,
     x: 0,
@@ -427,7 +468,9 @@ onMounted(() => {
     callbackHandler.draw,
     callbackHandler.firstMove,
     callbackHandler.onmove,
-    callbackHandler.choosePeice
+    callbackHandler.choosePeice,
+    callbackHandler.beforeMove,
+    callbackHandler.cancelMove
   )
 
   state.xiangqiBoard.start(

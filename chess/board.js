@@ -549,11 +549,18 @@ Position.prototype.changeSide = function () {
   this.zobristLock ^= PreGen_zobristLockPlayer
 }
 
-Position.prototype.makeMove = function (mv) {
+Position.prototype.makeMove = function (
+  mv,
+  beforeMoveCallback,
+  cancelMoveCallback
+) {
   let zobristKey = this.zobristKey
+  beforeMoveCallback?.()
+
   this.movePiece(mv)
   if (this.checked()) {
     console.log("checked")
+    cancelMoveCallback?.()
     this.undoMovePiece(mv)
     return false
   }
@@ -1940,21 +1947,28 @@ export default class Board extends EventTarget {
   }
 
   addMove(mv, computerMove) {
-    // console.log("%cboard.js line:1946 mv", "color: #007acc;", mv)
-    // console.log(`addMove`)
-    if (!this.pos.legalMove(mv) || !this.pos.makeMove(mv)) {
-      // console.log("Not Illegal move")
+    const self = this
+    if (
+      !this.pos.legalMove(mv) ||
+      !this.pos.makeMove(
+        mv,
+        () => {
+          self.dispatchEvent(new CustomEvent("beforeMove", { detail: { mv } }))
+        },
+        () => {
+          self.dispatchEvent(new CustomEvent("cancelMove", { detail: { mv } }))
+        }
+      )
+    ) {
+      console.log("Not legal move")
       return
     }
     this.busy = true
 
-    // console.log("===========", "this.busy = true", (this.busy = true))
     if (!this.animated) {
-      // console.log("0000000000")
       this.postAddMove(mv, computerMove)
       return
     }
-    // console.log(1111111111)
 
     let srcStyle = this.imgSquares[this.flipped(SRC(mv))].style
     let dstStyle = this.imgSquares[this.flipped(DST(mv))].style
