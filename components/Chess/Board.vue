@@ -227,7 +227,7 @@ const handler = {
   getSquareName(square: number) {
     return state.xiangqiBoard.board.getSquareName(square)
   },
-  convertMoveToHumanReadable(move: string) {
+  convertMoveToHumanReadable(move: string, reverseSide: boolean = false) {
     const result: {
       peice: string
       srcPos: number
@@ -241,13 +241,13 @@ const handler = {
     }
     const vmove = $utils.moveToVmove(move)
     const { src, tgr } = $utils.VmoveToSrcTgrObj(vmove)
+    const isPrimarySide = reverseSide
+      ? state.xiangqiBoard.board.pos.sdPlayer !== 0
+      : state.xiangqiBoard.board.pos.sdPlayer === 0
 
     const srcName = handler.getSquareName(src)
     const tgrName = handler.getSquareName(tgr)
-    const matrix =
-      state.xiangqiBoard.board.pos.sdPlayer === 0
-        ? PRIMARY_MATRIX
-        : SECOND_MATRIX
+    const matrix = isPrimarySide ? PRIMARY_MATRIX : SECOND_MATRIX
 
     const srcRank = parseInt(move[1])
     const tgrRank = parseInt(move[3])
@@ -257,9 +257,9 @@ const handler = {
     result.action = (() => {
       if (srcRank === tgrRank) return "bình"
       if (srcRank < tgrRank) {
-        return state.xiangqiBoard.board.pos.sdPlayer === 0 ? "tấn" : "thoái"
+        return isPrimarySide ? "tấn" : "thoái"
       } else {
-        return state.xiangqiBoard.board.pos.sdPlayer === 0 ? "thoái" : "tấn"
+        return isPrimarySide ? "thoái" : "tấn"
       }
     })()
     result.tgrPos =
@@ -371,7 +371,7 @@ const state = reactive<{
   squares: [],
   drawingSquares: [],
   currentSquareClicked: null,
-  isRedFirst: 1,
+  isRedFirst: 0,
   drawingSuggestionMove: {
     y: 0,
     x: 0,

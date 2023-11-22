@@ -43,7 +43,7 @@
 
       <div
         v-for="(
-          { depth, score, time, nodes, moves, vmove, type }, index
+          { depth, score, time, nodes, vmove, type, translate }, index
         ) in movesFilteredComputed"
         :key="index"
         class="engine__move-item cursor-pointer flex flex-wrap max-w-full p-2"
@@ -57,7 +57,7 @@
         <div class="flex-1 font-bold text-blue-700">Score: {{ score }}</div>
         <div class="flex-1 font-bold text-blue-700">Time: {{ time }}s</div>
         <div class="flex-1 font-bold text-blue-700">NPS: {{ nodes }}</div>
-        <div class="px-2 flex-4 w-full">{{ moves }}</div>
+        <div class="px-2 flex-4 w-full">{{ translate }}</div>
       </div>
     </template>
 
@@ -213,6 +213,16 @@ const movesFilteredComputed = computed(() => {
         vmove: nuxtApp.$utils.moveToVmove(moves[0]),
         bestvmove: nuxtApp.$utils.moveToVmove(moves[0]),
         pondervmove: nuxtApp.$utils.moveToVmove(moves[1]),
+        translate: item.moves
+          .split(" ")
+          .filter((data) => !!data)
+          .map((data, index) =>
+            $chessBoard.handler.convertMoveToHumanReadable(
+              data,
+              index % 2 !== 0
+            )
+          )
+          .join(", "),
       }
     })
 })
