@@ -31,7 +31,12 @@
           </g>
         </svg>
       </UButton>
-      <UButton color="primary" size="xl" variant="solid" @click="">
+      <UButton
+        color="primary"
+        size="xl"
+        variant="solid"
+        @click="handleSwitchSide"
+      >
         <svg
           xmlns="http://www.w3.org/2000/svg"
           width="24"
@@ -150,7 +155,7 @@
 import { getCurrentInstance } from "vue"
 import Moves from "./Moves.vue"
 import XiangQi from "~/chess/app"
-import { wait } from "~/helpers/utils"
+import { getUriWithParam, wait } from "~/helpers/utils"
 
 function MOVE(sqSrc: number, sqDst: number) {
   return sqSrc + (sqDst << 8)
@@ -262,6 +267,8 @@ const nuxtApp = useNuxtApp()
 const $appState = nuxtApp.$appState()
 const { $utils }: any = useNuxtApp()
 const boardRef = ref<HTMLDivElement | null>(null)
+const route = useRoute()
+const router = useRouter()
 
 const childrends: Childrends = { movesComp: null }
 const handler = {
@@ -478,7 +485,7 @@ const state = reactive<StateType>({
   squares: [],
   drawingSquares: [],
   currentSquareClicked: null,
-  isRedFirst: 1,
+  isRedFirst: route.query.side === "black" ? 0 : 1,
   drawingSuggestionMove: {
     y: 0,
     x: 0,
@@ -527,6 +534,14 @@ const clearDrawingSuggestionMove = () => {
   state.drawingSuggestionMove.width = 0
   state.drawingSuggestionMove.from = 0
   state.drawingSuggestionMove.to = 0
+}
+
+const handleSwitchSide = () => {
+  const url = getUriWithParam(window.location.href, {
+    side: route.query.side === "black" ? "" : "black",
+  })
+
+  window.location.assign(url)
 }
 
 onMounted(() => {

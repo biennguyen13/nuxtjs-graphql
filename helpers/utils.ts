@@ -26,3 +26,17 @@ export async function wait(ms = 1000) {
     }, ms)
   })
 }
+
+export const getUriWithParam = (baseUrl, params) => {
+  const Url = new URL(baseUrl)
+  const urlParams = new URLSearchParams(Url.search)
+  for (const key in params) {
+    if (params[key] !== undefined) {
+      urlParams.set(key, params[key])
+    }
+  }
+  Url.search = urlParams.toString()
+
+  const split = Url.toString().split("?")
+  return split[0] + "?" + split[1]
+}
