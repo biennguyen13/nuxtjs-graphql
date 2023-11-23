@@ -53,21 +53,22 @@ export default {
     const this_ = getCurrentInstance()
 
     const nuxtApp = useNuxtApp()
-    const $chessBoard = nuxtApp.$chessBoard()
-
+    const chessboardState = nuxtApp.$chessBoard().chessboardState
     const state = reactive<StateType>({
       // movesList: [],
       // translatedMovesList: [],
       srctgrMovesComputed: [],
     })
     const movesList = computed(() => {
-      return $chessBoard.xiangqiBoard.getMoveList($chessBoard.mvList) || []
+      return (
+        chessboardState.xiangqiBoard.getMoveList(chessboardState.mvList) || []
+      )
     })
     const vmovesList = computed(() => {
-      return $chessBoard.mvList || []
+      return chessboardState.mvList || []
     })
     const translatedList = computed(() => {
-      return $chessBoard.translatedList || []
+      return chessboardState.translatedList || []
     })
     watch(
       () => vmovesList.value,
@@ -110,14 +111,14 @@ export default {
       })
       _move.select = true
 
-      $chessBoard.handler.restartBoard(_index, _move.vmove)
+      chessboardState.handler.restartBoard(_index, _move.vmove)
 
       const {
         srctgr: { src, tgr },
       } = _move
       if (src && tgr) {
-        $chessBoard.handler.drawSquare(src, true)
-        $chessBoard.handler.drawSquare(tgr, true)
+        chessboardState.handler.drawSquare(src, true)
+        chessboardState.handler.drawSquare(tgr, true)
       }
       // this_?.proxy?.$forceUpdate()
     }
@@ -151,13 +152,13 @@ export default {
     }
 
     onBeforeMount(() => {
-      $chessBoard.childrends.movesComp = this_
+      chessboardState.childrends.movesComp = this_
     })
 
     return {
       this_,
       nuxtApp,
-      chessBoard: $chessBoard,
+      chessBoard: chessboardState,
       movesList,
       vmovesList,
       state,

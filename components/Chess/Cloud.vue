@@ -40,7 +40,7 @@
           color="primary"
           size="xl"
           variant="solid"
-          @click="!state.delay && handleGetCloud($chessBoard.currentFEN)"
+          @click="!state.delay && handleGetCloud(chessboardState.currentFEN)"
         >
           Reload
         </UButton>
@@ -58,7 +58,7 @@ import { addCookieValue } from "~/helpers/cookies"
 import { wait } from "~/helpers/utils"
 
 const nuxtApp = useNuxtApp()
-const $chessBoard = nuxtApp.$chessBoard()
+const chessboardState = nuxtApp.$chessBoard().chessboardState
 
 const state = reactive({
   moves: "",
@@ -67,7 +67,7 @@ const state = reactive({
 })
 
 watch(
-  () => $chessBoard.currentFEN,
+  () => chessboardState.currentFEN,
   async (FEN) => {
     if (FEN && !state.loading) {
       state.loading = true
@@ -95,7 +95,9 @@ const movesFilteredComputed = computed(() => {
       })
       ?.map((item) => ({
         ...item,
-        translate: $chessBoard.handler.convertMoveToHumanReadable(item.move),
+        translate: chessboardState.handler.convertMoveToHumanReadable(
+          item.move
+        ),
       })) ?? []
   )
 })
@@ -115,7 +117,7 @@ const handleClick = (move) => {
   if (state.loading) return
 
   const [src, tgr] = move.split("|")[1].split(":")
-  $chessBoard.handler.makeMove(src, tgr)
+  chessboardState.handler.makeMove(src, tgr)
 }
 
 const handleGetCloud = async (FEN) => {
@@ -140,7 +142,7 @@ const handleaddChessdb = async () => {
         ${addChessdbMutation}
       `,
       variables: {
-        FEN: $chessBoard.currentFEN,
+        FEN: chessboardState.currentFEN,
         value: state.moves,
       },
     })
@@ -170,10 +172,10 @@ const handleGetXapiCdbToken = async () => {
 }
 const handleMouseEnter = (move) => {
   const [src, tgr] = move.split("|")[1].split(":")
-  $chessBoard.handler.setDrawingSuggestionMove(src, tgr)
+  chessboardState.handler.setDrawingSuggestionMove(src, tgr)
 }
 const handleMouseLeave = () => {
-  $chessBoard.handler.setDrawingSuggestionMove(null)
+  chessboardState.handler.setDrawingSuggestionMove(null)
 }
 </script>
 

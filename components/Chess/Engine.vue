@@ -75,7 +75,7 @@
           color="primary"
           size="xl"
           variant="solid"
-          @click="!state.delay && handleSendAnalyze($chessBoard.currentFEN)"
+          @click="!state.delay && handleSendAnalyze(chessboardState.currentFEN)"
         >
           Reload
         </UButton>
@@ -92,7 +92,7 @@
 import { wait } from "~/helpers/utils"
 
 const nuxtApp = useNuxtApp()
-const $chessBoard = nuxtApp.$chessBoard()
+const chessboardState = nuxtApp.$chessBoard().chessboardState
 const $appState = nuxtApp.$appState()
 
 const { getToken } = useApollo()
@@ -152,7 +152,7 @@ const handleSendAnalyze = (FEN) => {
 }
 
 watch(
-  () => $chessBoard.currentFEN,
+  () => chessboardState.currentFEN,
   async (FEN) => {
     if (FEN) {
       try {
@@ -226,7 +226,7 @@ const bestMove = computed(() => {
       translate: [bestmove, ponder]
         .filter((data) => !!data)
         .map((data, index) =>
-          $chessBoard.handler.convertMoveToHumanReadable(data, index % 2 !== 0)
+          chessboardState.handler.convertMoveToHumanReadable(data, index % 2 !== 0)
         )
         .join(", "),
     }
@@ -260,7 +260,7 @@ const movesFilteredComputed = computed(() => {
           .split(" ")
           .filter((data) => !!data)
           .map((data, index) =>
-            $chessBoard.handler.convertMoveToHumanReadable(
+            chessboardState.handler.convertMoveToHumanReadable(
               data,
               index % 2 !== 0
             )
@@ -281,8 +281,8 @@ const bestMoveCoordinates = computed(() => {
 
   let { src, tgr } = nuxtApp.$utils.VmoveToSrcTgrObj(bestvmove)
 
-  src = $chessBoard.handler.flipped(src)
-  tgr = $chessBoard.handler.flipped(tgr)
+  src = chessboardState.handler.flipped(src)
+  tgr = chessboardState.handler.flipped(tgr)
 
   const srcEle = document.querySelector(`[xisqr="${src}"]`)
   const tgrEle = document.querySelector(`[xisqr="${tgr}"]`)
@@ -345,8 +345,8 @@ const ponderMoveCoordinates = computed(() => {
 
   let { src, tgr } = nuxtApp.$utils.VmoveToSrcTgrObj(pondervmove)
 
-  src = $chessBoard.handler.flipped(src)
-  tgr = $chessBoard.handler.flipped(tgr)
+  src = chessboardState.handler.flipped(src)
+  tgr = chessboardState.handler.flipped(tgr)
 
   const srcEle = document.querySelector(`[xisqr="${src}"]`)
   const tgrEle = document.querySelector(`[xisqr="${tgr}"]`)
@@ -422,7 +422,7 @@ onUnmounted(() => {
 
 const handleClick = (vmove) => {
   const { src, tgr } = nuxtApp.$utils.VmoveToSrcTgrObj(vmove)
-  $chessBoard.handler.makeMove(src, tgr)
+  chessboardState.handler.makeMove(src, tgr)
 }
 function calculateMidpointAndDistance(x1, y1, x2, y2) {
   // Calculate midpoint

@@ -269,6 +269,7 @@ const { $utils }: any = useNuxtApp()
 const boardRef = ref<HTMLDivElement | null>(null)
 const route = useRoute()
 const router = useRouter()
+const emit = defineEmits(["switchSide"])
 
 const childrends: Childrends = { movesComp: null }
 const handler = {
@@ -504,10 +505,16 @@ const isRedFirst = computed(() => {
   return state.isRedFirst
 })
 
+const chessBoardProvide = {
+  chessboardState: state,
+}
+
 try {
-  nuxtApp.provide("chessBoard", (name) => state)
+  nuxtApp.provide("chessBoard", (name: string) => chessBoardProvide)
 } catch (e) {
   console.log("Error" + e)
+  const provide_ = nuxtApp.$chessBoard()
+  provide_.chessboardState = state
 }
 
 const handlePrevious = $utils.throttle(async () => {
@@ -537,11 +544,13 @@ const clearDrawingSuggestionMove = () => {
 }
 
 const handleSwitchSide = () => {
-  const url = getUriWithParam(window.location.href, {
-    side: route.query.side === "black" ? "" : "black",
+  router.replace({
+    query: {
+      side: route.query.side === "black" ? "" : "black",
+    },
   })
 
-  window.location.assign(url)
+  emit("switchSide")
 }
 
 onMounted(() => {

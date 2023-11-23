@@ -45,7 +45,7 @@ type Move = {
 }
 
 const nuxtApp = useNuxtApp()
-const $chessBoard = nuxtApp.$chessBoard?.()
+const chessboardState = nuxtApp.$chessBoard().chessboardState
 
 const state = reactive<{ moves: Move[] }>({
   moves: [],
@@ -57,7 +57,7 @@ const { refetch, load, onResult, onError, loading } = useLazyQuery(
   `,
   {
     FEN:
-      $chessBoard.currentFEN ||
+      chessboardState.currentFEN ||
       "rnbakabnr/9/1c5c1/p1p1p1p1p/9/9/P1P1P1P1P/1C5C1/9/RNBAKABNR w",
   },
   {
@@ -65,7 +65,7 @@ const { refetch, load, onResult, onError, loading } = useLazyQuery(
   }
 )
 watch(
-  () => $chessBoard.currentFEN,
+  () => chessboardState.currentFEN,
   async (newValue) => {
     if (newValue) {
       ;(await load()) || (await refetch({ FEN: newValue }))
@@ -83,7 +83,7 @@ onError((e) => {
 const translatedMoves = computed(() => {
   return state.moves.map((data: any) => ({
     ...data,
-    translate: $chessBoard.handler.convertMoveToHumanReadable(
+    translate: chessboardState.handler.convertMoveToHumanReadable(
       data.vmove.split("|")[0]
     ),
   }))
@@ -92,14 +92,14 @@ const translatedMoves = computed(() => {
 const handleClick = ({ vmove }: Move) => {
   if (loading.value) return
   const [src, tgr] = vmove.split("|")[1].split(":")
-  $chessBoard.handler.makeMove(src, tgr)
+  chessboardState.handler.makeMove(src, tgr)
 }
 const handleMouseEnter = (vmove: string) => {
   const [src, tgr] = vmove.split("|")[1].split(":")
-  $chessBoard.handler.setDrawingSuggestionMove(src, tgr)
+  chessboardState.handler.setDrawingSuggestionMove(src, tgr)
 }
 const handleMouseLeave = () => {
-  $chessBoard.handler.setDrawingSuggestionMove(null)
+  chessboardState.handler.setDrawingSuggestionMove(null)
 }
 </script>
 
