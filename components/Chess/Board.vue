@@ -35,7 +35,7 @@
         color="primary"
         size="xl"
         variant="solid"
-        @click="handleSwitchSide"
+        @click="lazyHandleSwitchSide"
       >
         <svg
           xmlns="http://www.w3.org/2000/svg"
@@ -176,7 +176,7 @@
       <div class="bg-slate-100 flex-grow min-w-[500px]">
         <ChessControlPanel
           :engine="{
-            computerTiming: 4500,
+            computerTiming: 3000,
             computerRed: state.computerRed,
             computerBlack: state.computerBlack,
           }"
@@ -514,7 +514,6 @@ const callbackHandler = {
     state.translatedList.pop()
   },
   checked(e: any) {
-    console.log("call back checked", e)
     state.checked = true
   },
 }
@@ -599,6 +598,9 @@ const handleSwitchSide = () => {
 
   emit("switchSide")
 }
+
+const lazyHandleSwitchSide = nuxtApp.$utils.debounce(handleSwitchSide, 750)
+
 const handleSelectComputerRed = () => {
   state.computerRed = !state.computerRed
 }

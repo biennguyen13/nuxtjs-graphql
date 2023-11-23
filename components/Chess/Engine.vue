@@ -166,6 +166,9 @@ const handleSendAnalyze = (FEN: string) => {
 }
 
 const lazyComputerExcute = nuxtApp.$utils.debounce(() => {
+  if (!document.body.contains(chessboardState.xiangqiBoard.board.element))
+    return
+
   console.log(
     props.computerRed,
     isRedTurnComputed.value,
@@ -182,6 +185,8 @@ const lazyComputerExcute = nuxtApp.$utils.debounce(() => {
       chessboardState.handler.makeMove(src, tgr)
     } catch (e) {
       console.log("Error " + e)
+
+      handleSendAnalyze(chessboardState.currentFEN)
     }
   }
 }, props.computerTiming)
@@ -484,7 +489,7 @@ watch(
 )
 
 onUnmounted(() => {
-  unwatch()
+  unwatch?.()
   socket.disconnect()
 })
 
