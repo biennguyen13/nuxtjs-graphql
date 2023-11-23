@@ -6,11 +6,51 @@
         size="xl"
         variant="solid"
         @click="handlePrevious"
-        >{{ "<" }}</UButton
       >
-      <UButton color="primary" size="xl" variant="solid" @click="handleNext">{{
-        ">"
-      }}</UButton>
+        <svg
+          xmlns="http://www.w3.org/2000/svg"
+          width="20"
+          height="20"
+          viewBox="0 0 20 20"
+        >
+          <path fill="currentColor" d="m4 10l9 9l1.4-1.5L7 10l7.4-7.5L13 1z" />
+        </svg>
+      </UButton>
+      <UButton color="primary" size="xl" variant="solid" @click="handleNext">
+        <svg
+          xmlns="http://www.w3.org/2000/svg"
+          width="20"
+          height="20"
+          viewBox="0 0 20 20"
+        >
+          <g transform="rotate(180 10 10)">
+            <path
+              fill="currentColor"
+              d="m4 10l9 9l1.4-1.5L7 10l7.4-7.5L13 1z"
+            />
+          </g>
+        </svg>
+      </UButton>
+      <UButton color="primary" size="xl" variant="solid" @click="">
+        <svg
+          xmlns="http://www.w3.org/2000/svg"
+          width="24"
+          height="24"
+          viewBox="0 0 24 24"
+        >
+          <svg
+            xmlns="http://www.w3.org/2000/svg"
+            width="24"
+            height="24"
+            viewBox="-1.5 -2.5 24 24"
+          >
+            <path
+              fill="currentColor"
+              d="m4.859 5.308l1.594-.488a1 1 0 0 1 .585 1.913l-3.825 1.17a1 1 0 0 1-1.249-.665L.794 3.413a1 1 0 1 1 1.913-.585l.44 1.441C5.555.56 10.332-1.035 14.573.703a9.381 9.381 0 0 1 5.38 5.831a1 1 0 1 1-1.905.608A7.381 7.381 0 0 0 4.86 5.308zm12.327 8.195l-1.775.443a1 1 0 1 1-.484-1.94l3.643-.909a.997.997 0 0 1 .61-.08a1 1 0 0 1 .84.75l.968 3.88a1 1 0 0 1-1.94.484l-.33-1.322a9.381 9.381 0 0 1-16.384-1.796l-.26-.634a1 1 0 1 1 1.851-.758l.26.633a7.381 7.381 0 0 0 13.001 1.25z"
+            />
+          </svg>
+        </svg>
+      </UButton>
     </div>
     <div class="flex">
       <div class="flex flex-shrink-0 flex-col">
@@ -26,6 +66,24 @@
           >
         </div>
         <div ref="boardRef" id="board" style="width: 400px; height: 400px">
+          <div
+            v-if="state.win || state.lose || state.draw || state.checked"
+            class="absolute inset-0 z-10 flex justify-center items-center"
+            @click="state.win = state.lose = state.draw = state.checked = false"
+          >
+            <div class="bg-red-400 text-white p-4">
+              {{
+                (() => {
+                  if (state.win) return "WIN"
+                  if (state.lose) return "LOSE"
+                  if (state.draw) return "DRAW"
+                  if (state.checked) return "CHECKED"
+                  return ""
+                })()
+              }}
+            </div>
+          </div>
+
           <div
             drawingSquares
             v-for="(sq, index) in state.drawingSquares"
@@ -131,6 +189,10 @@ type StateType = {
     from: string | number
     to: string | number
   }
+  checked: boolean
+  win: boolean
+  lose: boolean
+  draw: boolean
 }
 interface Childrends {
   movesComp: typeof Moves | null
@@ -304,12 +366,15 @@ const handler = {
 const callbackHandler = {
   win() {
     console.log("call back win")
+    state.win = true
   },
   draw() {
     console.log("call back draw")
+    state.draw = true
   },
   lose() {
     console.log("call back lose")
+    state.lose = true
   },
   firstMove() {
     console.log("call back firstMove")
@@ -395,8 +460,9 @@ const callbackHandler = {
   cancelMove({ detail: { mv } }: { detail: { mv: number } }) {
     state.translatedList.pop()
   },
-  checked(e) {
+  checked(e: any) {
     console.log("call back checked", e)
+    state.checked = true
   },
 }
 
@@ -421,6 +487,10 @@ const state = reactive<StateType>({
     from: 0,
     to: 0,
   },
+  checked: false,
+  win: false,
+  lose: false,
+  draw: false,
 })
 
 const isRedFirst = computed(() => {
