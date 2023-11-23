@@ -2088,7 +2088,7 @@ export default class Board extends EventTarget {
       return
     }
 
-    let vlRep = this.pos.repStatus(30)
+    let vlRep = this.pos.repStatus(300)
     if (vlRep > 0) {
       let msg
       vlRep = this.pos.repValue(vlRep)

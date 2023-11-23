@@ -2,7 +2,7 @@
   <div class="flex flex-col justify-end h-full">
     <div class="flex-grow overflow-y-auto max-h-[617px]">
       <ChessBook v-show="state.component === 0" />
-      <ChessEngine v-show="state.component === 1" />
+      <ChessEngine v-show="state.component === 1" v-bind="engineProps" />
       <ChessCloud v-show="state.component === 2" />
       <ChessMoves v-show="state.component === 3" />
     </div>
@@ -44,6 +44,11 @@
 </template>
 
 <script setup lang="ts">
+const attr = useAttrs()
+const engineProps = computed(() => {
+  return attr.engine
+})
+
 const state = reactive({
   component: 0,
 })

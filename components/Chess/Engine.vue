@@ -41,13 +41,13 @@
         </svg>
       </div>
 
-      <template v-if="movesFilteredComputed.length || bestMove">
+      <template v-if="movesFilteredComputed.length || bestMoveFinal">
         <div
           v-for="(
             { depth, score, time, nodes, vmove, type, translate }, index
           ) in movesFilteredComputed.length
             ? movesFilteredComputed
-            : [bestMove]"
+            : [bestMoveFinal]"
           :key="index"
           class="engine__move-item cursor-pointer flex flex-wrap max-w-full p-2"
           :class="{
@@ -88,8 +88,21 @@
   </div>
 </template>
 
-<script setup>
+<script setup lang="ts">
 import { wait } from "~/helpers/utils"
+
+const props = withDefaults(
+  defineProps<{
+    computerTiming: number
+    computerRed: boolean
+    computerBlack: boolean
+  }>(),
+  {
+    computerTiming: 5000,
+    computerRed: false,
+    computerBlack: false,
+  }
+)
 
 const nuxtApp = useNuxtApp()
 const chessboardState = nuxtApp.$chessBoard().chessboardState
@@ -143,14 +156,35 @@ socket.on("disconnect", () => {
   console.log("socket disconnect")
 })
 
-const handleSendAnalyze = (FEN) => {
+const handleSendAnalyze = (FEN: string) => {
   state.analysis = []
   socket.emit("analyze", {
     depth: 40,
     FEN: FEN || "rnbakabnr/9/1c5c1/p1p1p1p1p/9/9/P1P1P1P1P/1C5C1/9/RNBAKABNR w",
   })
+  lazyComputerExcute()
 }
 
+const lazyComputerExcute = nuxtApp.$utils.debounce(() => {
+  console.log(
+    props.computerRed,
+    isRedTurnComputed.value,
+    props.computerBlack,
+    isBlackTurnComputed.value
+  )
+  if (
+    (props.computerRed && isRedTurnComputed.value) ||
+    (props.computerBlack && isBlackTurnComputed.value)
+  ) {
+    try {
+      const { vmove } = movesFilteredComputed.value[0]
+      const { src, tgr } = nuxtApp.$utils.VmoveToSrcTgrObj(vmove as number)
+      chessboardState.handler.makeMove(src, tgr)
+    } catch (e) {
+      console.log("Error " + e)
+    }
+  }
+}, props.computerTiming)
 watch(
   () => chessboardState.currentFEN,
   async (FEN) => {
@@ -166,6 +200,35 @@ watch(
     immediate: true,
   }
 )
+watch(
+  () => [props.computerRed, props.computerBlack],
+  async ([computerRed, computerBlack]) => {
+    ;(computerRed || computerBlack) && lazyComputerExcute()
+  },
+  {
+    immediate: true,
+    deep: true,
+  }
+)
+
+let unwatch: any = null
+onMounted(() => {
+  setTimeout(() => {
+    unwatch = watch(
+      () => chessboardState.xiangqiBoard.board.pos.sdPlayer,
+      (_) => {
+        console.log(_)
+      }
+    )
+  }, 500)
+})
+
+const isRedTurnComputed = computed(() => {
+  return chessboardState.xiangqiBoard.board.pos.sdPlayer === 0
+})
+const isBlackTurnComputed = computed(() => {
+  return chessboardState.xiangqiBoard.board.pos.sdPlayer === 1
+})
 
 const movesComputed = computed(() => {
   return state.analysis
@@ -198,7 +261,7 @@ const movesComputed = computed(() => {
     })
     .reverse()
 })
-const bestMove = computed(() => {
+const bestMoveFinal = computed(() => {
   const best = JSON.parse(
     JSON.stringify(
       movesComputed.value.filter(({ moves }) => {
@@ -226,7 +289,10 @@ const bestMove = computed(() => {
       translate: [bestmove, ponder]
         .filter((data) => !!data)
         .map((data, index) =>
-          chessboardState.handler.convertMoveToHumanReadable(data, index % 2 !== 0)
+          chessboardState.handler.convertMoveToHumanReadable(
+            data,
+            index % 2 !== 0
+          )
         )
         .join(", "),
     }
@@ -238,7 +304,28 @@ const bestMove = computed(() => {
 
   return null
 })
+
+const isOutofPooling = computed(() => {
+  return state.analysis.some(({ type }) => type === "BUSY")
+})
+watch(
+  () => isOutofPooling.value,
+  async (_) => {
+    if (_) {
+      state.delay = true
+      await wait(3000)
+      state.delay = false
+    }
+  }
+)
+
+const outofPoolingText = computed(() => {
+  return state.analysis.find(({ type }) => type === "BUSY")?.msg
+})
+
 const movesFilteredComputed = computed(() => {
+  if (isOutofPooling.value) return []
+
   return movesComputed.value
     .filter(({ moves }) => {
       return (
@@ -396,25 +483,8 @@ watch(
   }
 )
 
-const isOutofPooling = computed(() => {
-  return state.analysis.some(({ type }) => type === "BUSY")
-})
-watch(
-  () => isOutofPooling.value,
-  async (_) => {
-    if (_) {
-      state.delay = true
-      await wait(3000)
-      state.delay = false
-    }
-  }
-)
-
-const outofPoolingText = computed(() => {
-  return state.analysis.find(({ type }) => type === "BUSY")?.msg
-})
-
 onUnmounted(() => {
+  unwatch()
   socket.disconnect()
 })
 

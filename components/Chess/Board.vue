@@ -56,6 +56,42 @@
           </svg>
         </svg>
       </UButton>
+      <UButton
+        :color="state.computerRed ? 'green' : 'primary'"
+        size="xl"
+        variant="solid"
+        @click="handleSelectComputerRed"
+      >
+        <svg
+          xmlns="http://www.w3.org/2000/svg"
+          width="24"
+          height="24"
+          viewBox="0 0 24 24"
+        >
+          <path
+            fill="#913e3e"
+            d="M1 21v-2h22v2H1Zm3-3q-.825 0-1.413-.588T2 16V5q0-.825.588-1.413T4 3h16q.825 0 1.413.588T22 5v11q0 .825-.588 1.413T20 18H4Zm0-2h16V5H4v11Zm0 0V5v11Z"
+          />
+        </svg>
+      </UButton>
+      <UButton
+        :color="state.computerBlack ? 'green' : 'primary'"
+        size="xl"
+        variant="solid"
+        @click="handleSelectComputerBlack"
+      >
+        <svg
+          xmlns="http://www.w3.org/2000/svg"
+          width="24"
+          height="24"
+          viewBox="0 0 24 24"
+        >
+          <path
+            fill="black"
+            d="M1 21v-2h22v2H1Zm3-3q-.825 0-1.413-.588T2 16V5q0-.825.588-1.413T4 3h16q.825 0 1.413.588T22 5v11q0 .825-.588 1.413T20 18H4Zm0-2h16V5H4v11Zm0 0V5v11Z"
+          />
+        </svg>
+      </UButton>
     </div>
     <div class="flex">
       <div class="flex flex-shrink-0 flex-col">
@@ -138,7 +174,13 @@
         </div>
       </div>
       <div class="bg-slate-100 flex-grow min-w-[500px]">
-        <ChessControlPanel />
+        <ChessControlPanel
+          :engine="{
+            computerTiming: 4500,
+            computerRed: state.computerRed,
+            computerBlack: state.computerBlack,
+          }"
+        />
       </div>
     </div>
 
@@ -198,6 +240,8 @@ type StateType = {
   win: boolean
   lose: boolean
   draw: boolean
+  computerRed: boolean
+  computerBlack: boolean
 }
 interface Childrends {
   movesComp: typeof Moves | null
@@ -445,6 +489,7 @@ const callbackHandler = {
       })
   },
   beforeMove({ detail: { mv } }: { detail: { mv: number } }) {
+    state.checked = false
     // thuật toán move của board ngược lại với book, nên cần đảo src <-> tgr
     const { src: _tgr, tgr: _src } = nuxtApp.$utils.VmoveToSrcTgrObj(mv) as {
       src: number
@@ -499,6 +544,8 @@ const state = reactive<StateType>({
   win: false,
   lose: false,
   draw: false,
+  computerRed: false,
+  computerBlack: false,
 })
 
 const isRedFirst = computed(() => {
@@ -551,6 +598,12 @@ const handleSwitchSide = () => {
   })
 
   emit("switchSide")
+}
+const handleSelectComputerRed = () => {
+  state.computerRed = !state.computerRed
+}
+const handleSelectComputerBlack = () => {
+  state.computerBlack = !state.computerBlack
 }
 
 onMounted(() => {
