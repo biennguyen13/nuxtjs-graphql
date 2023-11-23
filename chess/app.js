@@ -72,6 +72,9 @@ XiangQi.prototype.init = function (computer = true, skill = 0, cnDBlevel = 0) {
   this.board.addEventListener("cancelMove", function (e) {
     self.cancelMoveCallback(e)
   })
+  this.board.addEventListener("checked", function (e) {
+    self.checkedCallback(e)
+  })
 
   let ongameover = function (evt) {
     let details = evt.detail
@@ -216,7 +219,8 @@ XiangQi.prototype.setCallBack = function (
   onmoveCallback,
   choosePeiceCallback,
   beforeMoveCallback,
-  cancelMoveCallback
+  cancelMoveCallback,
+  checkedCallback
 ) {
   this.winCallback = winCallBack
   this.loseCallback = loseCallBack
@@ -226,6 +230,7 @@ XiangQi.prototype.setCallBack = function (
   this.choosePeiceCallback = choosePeiceCallback
   this.beforeMoveCallback = beforeMoveCallback
   this.cancelMoveCallback = cancelMoveCallback
+  this.checkedCallback = checkedCallback
 }
 
 XiangQi.prototype.setLevel = function (level = 3) {

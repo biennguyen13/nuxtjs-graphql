@@ -41,24 +41,28 @@
         </svg>
       </div>
 
-      <div
-        v-for="(
-          { depth, score, time, nodes, vmove, type, translate }, index
-        ) in movesFilteredComputed"
-        :key="index"
-        class="engine__move-item cursor-pointer flex flex-wrap max-w-full p-2"
-        :class="{
-          'bg-red-50': type === 'ANALYZE',
-          'bg-blue-50': type === 'LAZY_ANALYZE',
-        }"
-        @click="handleClick(vmove)"
-      >
-        <div class="flex-1 font-bold text-blue-700">Depth: {{ depth }}</div>
-        <div class="flex-1 font-bold text-blue-700">Score: {{ score }}</div>
-        <div class="flex-1 font-bold text-blue-700">Time: {{ time }}s</div>
-        <div class="flex-1 font-bold text-blue-700">NPS: {{ nodes }}</div>
-        <div class="px-2 flex-4 w-full">{{ translate }}</div>
-      </div>
+      <template v-if="movesFilteredComputed.length || bestMove">
+        <div
+          v-for="(
+            { depth, score, time, nodes, vmove, type, translate }, index
+          ) in movesFilteredComputed.length
+            ? movesFilteredComputed
+            : [bestMove]"
+          :key="index"
+          class="engine__move-item cursor-pointer flex flex-wrap max-w-full p-2"
+          :class="{
+            'bg-red-50': type === 'ANALYZE',
+            'bg-blue-50': type === 'LAZY_ANALYZE',
+          }"
+          @click="handleClick(vmove)"
+        >
+          <div class="flex-1 font-bold text-blue-700">Depth: {{ depth }}</div>
+          <div class="flex-1 font-bold text-blue-700">Score: {{ score }}</div>
+          <div class="flex-1 font-bold text-blue-700">Time: {{ time }}s</div>
+          <div class="flex-1 font-bold text-blue-700">NPS: {{ nodes }}</div>
+          <div class="px-2 flex-4 w-full">{{ translate }}</div>
+        </div>
+      </template>
     </template>
 
     <div
@@ -194,7 +198,46 @@ const movesComputed = computed(() => {
     })
     .reverse()
 })
+const bestMove = computed(() => {
+  const best = JSON.parse(
+    JSON.stringify(
+      movesComputed.value.filter(({ moves }) => {
+        return moves.includes("bestmove")
+      })[0] ?? null
+    )
+  )
 
+  let result = null
+  if (best) {
+    const moves = best.moves
+      ?.replaceAll("\n", "")
+      ?.replaceAll("\r", "")
+      ?.split("bestmove")[1]
+      ?.split(" ")
+
+    const bestmove = moves[1]
+    const ponder = moves[3]
+
+    result = {
+      ...best,
+      vmove: nuxtApp.$utils.moveToVmove(bestmove),
+      bestvmove: nuxtApp.$utils.moveToVmove(bestmove),
+      pondervmove: nuxtApp.$utils.moveToVmove(ponder),
+      translate: [bestmove, ponder]
+        .filter((data) => !!data)
+        .map((data, index) =>
+          $chessBoard.handler.convertMoveToHumanReadable(data, index % 2 !== 0)
+        )
+        .join(", "),
+    }
+  }
+
+  if (result?.vmove) {
+    return result
+  }
+
+  return null
+})
 const movesFilteredComputed = computed(() => {
   return movesComputed.value
     .filter(({ moves }) => {

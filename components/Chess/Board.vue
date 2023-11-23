@@ -395,6 +395,9 @@ const callbackHandler = {
   cancelMove({ detail: { mv } }: { detail: { mv: number } }) {
     state.translatedList.pop()
   },
+  checked(e) {
+    console.log("call back checked", e)
+  },
 }
 
 const state = reactive<StateType>({
@@ -467,7 +470,8 @@ onMounted(() => {
     callbackHandler.onmove,
     callbackHandler.choosePeice,
     callbackHandler.beforeMove,
-    callbackHandler.cancelMove
+    callbackHandler.cancelMove,
+    callbackHandler.checked
   )
 
   state.xiangqiBoard.start(

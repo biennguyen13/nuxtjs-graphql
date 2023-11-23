@@ -474,9 +474,10 @@ for (let i = 0; i < 14; ++i) {
   PreGen_zobristLockTable.push(locks)
 }
 
-function Position() {
+function Position(checkedCallback) {
   // sdPlayer, zobristKey, zobristLock, vlWhite, vlBlack, distance;
   // squares, mvList, pcList, keyList, chkList;
+  this.checkedCallback = checkedCallback
 }
 
 Position.prototype.clearBoard = function () {
@@ -567,6 +568,13 @@ Position.prototype.makeMove = function (
   this.keyList.push(zobristKey)
   this.changeSide()
   this.chkList.push(this.checked())
+
+  setTimeout(() => {
+    if (this.chkList[this.chkList.length - 1]) {
+      this.checkedCallback({ mv })
+    }
+  }, 1)
+
   ++this.distance
   return true
 }
@@ -1753,7 +1761,9 @@ export default class Board extends EventTarget {
     this.computer = computer
     this.online = online
 
-    this.pos = new Position()
+    this.pos = new Position((data) => {
+      this.dispatchEvent(new CustomEvent("checked", { detail: { data } }))
+    })
     this.pos.fromFen(fen)
 
     this.animated = false

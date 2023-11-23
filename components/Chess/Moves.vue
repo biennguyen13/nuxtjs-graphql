@@ -157,7 +157,7 @@ export default {
     return {
       this_,
       nuxtApp,
-      $chessBoard,
+      chessBoard: $chessBoard,
       movesList,
       vmovesList,
       state,
