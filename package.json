@@ -6,7 +6,7 @@
     "dev": "npx nuxt dev --dotenv .env.local",
     "dev:prd": "npx nuxt dev --dotenv .env.production",
     "build": "nuxt build --dotenv .env.production",
-    "generate": "nuxt generate",
+    "generate": "nuxt generate --dotenv .env.production",
     "preview": "nuxt preview",
     "postinstall": "nuxt prepare"
   },

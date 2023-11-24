@@ -171,13 +171,15 @@ const lazyComputerExcute = nuxtApp.$utils.debounce(() => {
 
   console.log(
     props.computerRed,
-    isRedTurnComputed.value,
+    chessboardState.xiangqiBoard.board.pos.sdPlayer === 0,
     props.computerBlack,
-    isBlackTurnComputed.value
+    chessboardState.xiangqiBoard.board.pos.sdPlayer === 1
   )
   if (
-    (props.computerRed && isRedTurnComputed.value) ||
-    (props.computerBlack && isBlackTurnComputed.value)
+    (props.computerRed &&
+      chessboardState.xiangqiBoard.board.pos.sdPlayer === 0) ||
+    (props.computerBlack &&
+      chessboardState.xiangqiBoard.board.pos.sdPlayer === 1)
   ) {
     try {
       const { vmove } = movesFilteredComputed.value[0]
@@ -228,12 +230,12 @@ onMounted(() => {
   }, 500)
 })
 
-const isRedTurnComputed = computed(() => {
-  return chessboardState.xiangqiBoard.board.pos.sdPlayer === 0
-})
-const isBlackTurnComputed = computed(() => {
-  return chessboardState.xiangqiBoard.board.pos.sdPlayer === 1
-})
+// const isRedTurnComputed = computed(() => {
+//   return chessboardState.xiangqiBoard.board.pos.sdPlayer === 0
+// })
+// const isBlackTurnComputed = computed(() => {
+//   return chessboardState.xiangqiBoard.board.pos.sdPlayer === 1
+// })
 
 const movesComputed = computed(() => {
   return state.analysis
